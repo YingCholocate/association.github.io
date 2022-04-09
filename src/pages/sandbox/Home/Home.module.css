@@ -1,0 +1,19 @@
+.resourcecontent{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    flex:1;
+    height:225px;
+    overflow: auto;
+}
+.liststyle{
+    display: flex;
+    flex-direction: column;
+    flex:1;
+    height:255px;
+    overflow:auto;
+}
+.buttonstyle{
+    margin-right: 10px;
+}

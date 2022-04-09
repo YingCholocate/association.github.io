@@ -1,0 +1,17 @@
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+}
+@import '~antd/dist/antd.css';
+
+.ant-table-thead>tr>th,.ant-table-row>td{
+  font-weight: bold;
+}
+
+#root,.ant-layout{
+  height:100%;
+}
+html,body{
+  height: 100%;
+}
