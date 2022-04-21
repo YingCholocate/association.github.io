@@ -15,8 +15,9 @@
     margin: 16px;
     background: rgba(255, 255, 255, 0.3);
   }
-.ant-layout-header .site-layout-background{
+#root,.ant-layout-header,.site-layout-background{
     background-color: #fff;
+    padding: 0;
   }
 
 #root,.ant-layout{

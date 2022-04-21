@@ -1,17 +1,26 @@
-.site-layout-content {
-  min-height: 280px;
-  padding: 24px;
-  background: #fff;
-}
 @import '~antd/dist/antd.css';
-
+html,body{
+  height: 100%;
+}
 .ant-table-thead>tr>th,.ant-table-row>td{
   font-weight: bold;
 }
-
 #root,.ant-layout{
   height:100%;
+  overflow: auto;
 }
-html,body{
-  height: 100%;
+/* #root,.ant-layout-content{
+  min-height: 100% !important;
+} */
+/* #root .site-layout{
+  height: 100vh;
+} */
+@media (max-width: 700px) {
+  #root .ant-layout-sider{
+    display: none !important;
+  }
+}
+
+#root .ant-card, .ant-card-bordered{
+  border-bottom: none;
 }

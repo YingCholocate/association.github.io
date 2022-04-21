@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import { connect } from 'react-redux';
 import { CollapsedReducer } from '../../redux/reducers/CollapsedReducer';
 import url from '../../utils/commonurl'
+import style from './index.module.css'
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -21,15 +22,20 @@ import Qs from 'qs';
   const { role, username,number} = JSON.parse(localStorage.getItem("token"))
 
   const changeCollapsed = () => {
-    props.changeCollapsed()
+    props.changeCollapsed();
+
   }
   const remove=()=>{
     localStorage.removeItem("token")
     navigate("/login")
   }
+
+  const changeinfo=()=>{
+    navigate('./myself')
+  }
   const menu = (
     <Menu>
-      <Menu.Item onClick={(e)=>{
+      <Menu.Item key={2} danger onClick={(e)=>{
        axios('association/users',{
           data:{
             number:number
@@ -53,23 +59,25 @@ import Qs from 'qs';
         );
         
       }}>注销</Menu.Item>
-
-      <Menu.Item danger onClick={remove}>退出</Menu.Item>
+     
+      <Menu.Item key={3} danger onClick={remove}>退出</Menu.Item>
 
     </Menu>
   );
 
   return (
-    <Header className="site-layout-background" style={{ padding: 0 }}>
+    <Header className="site-layout-background" style={{padding: '0 12px'}}>
       {
-        props.isCollapsed ? <MenuUnfoldOutlined style={{color:'white'}}onClick={changeCollapsed} /> : <MenuFoldOutlined style={{color:'white'}}onClick={changeCollapsed} />
+        props.isCollapsed ? <MenuUnfoldOutlined className={style.menustyle}  style={{color:'white'}}onClick={changeCollapsed} /> 
+        : <MenuFoldOutlined className={style.menustyle} style={{color:'white'}}onClick={changeCollapsed} />
       }
-      <div style={{ float: " right",color:'white'}}>
-        <span style={{margin:"10px"}}>欢迎<span style={{color:"#18900f"}}>{username}</span>回来</span>
+      <div style={{ float: " right",color:'white',marginRight:'5px'}}>
+        <span style={{margin:"10px"}}>欢迎<span style={{color:"lightblue"}}>{username}</span>回来</span>
         <Dropdown overlay={menu}>
           <Avatar  size="large" icon={<UserOutlined />} />
         </Dropdown>
       </div>
+      
     </Header>
   )
 }

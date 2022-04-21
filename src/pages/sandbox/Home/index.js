@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button } from 'antd';
-import { Layout, Menu, List, Avatar, Divider,message } from 'antd';
+import { Layout, Menu, List, Avatar, Divider, message, Pagination, Empty } from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 import { Outlet } from "react-router-dom";
@@ -9,7 +9,9 @@ import axios from 'axios';
 import url from '../../../utils/commonurl'
 import style from './Home.module.css'
 import { Collapse } from 'antd';
+import path from '../../../assets/photologo.png'
 import Qs from 'qs'
+import Departahow from "../../../components/Departahow";
 const { Panel } = Collapse;
 
 const { SubMenu } = Menu;
@@ -23,7 +25,9 @@ export default class Home extends React.Component {
         jishu: [],
         mishu: [],
         yance: [],
-        shuzi: []
+        shuzi: [],
+        limitSize: 3,//每一页最多显示的记录数量
+
     };
 
     showModal = () => {
@@ -69,25 +73,49 @@ export default class Home extends React.Component {
         })
 
     }
-    componentDidMount() {
-        axios.get('association/resourcedata')
+    // 获取推文数据
+    getarticleData = (num) => {
+
+        axios.get(`association/resourcedata?type=1&currentPage=${num}`)
             .then(res => {
-                this.setState({
-                    resourcedata: res.data,
+                console.log(res.data)
+                localStorage.setItem('article' + num, JSON.stringify(res.data))
+                const arr1 = [];
+                res.data[0].map(item => {
+                    arr1.push(item)
 
                 })
-                console.log(res.data)
-                localStorage.setItem('resourcedata', JSON.stringify(res.data))
-                const arr1 = [];
+                this.setState({
+                    articledata: arr1,
+                    limitPage: res.data[1],//一共分为多少页
+                    total: res.data[2]//总共有多少条数据
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    componentDidMount() {
+        let article = JSON.parse(localStorage.getItem('article1'))
+        if (article) {
+            this.setState({
+                articledata: article[0],
+                limitPage: article[1],//一共分为多少页
+                total:article[2]//总共有多少条数据
+            })
+        } else {
+            // 获取社团资源
+            this.getarticleData(1)
+        }
+
+        axios.get('association/resourcedata?type=3')
+            .then(res => {
                 const arr2 = [];
                 const arr3 = [];
                 const arr4 = [];
                 const arr5 = [];
                 res.data.map(item => {
                     switch (item.type) {
-                        case 1:
-                            arr1.push(item);
-                            break;
                         case 2:
                             arr2.push(item);
                             break;
@@ -100,63 +128,124 @@ export default class Home extends React.Component {
                         case 5:
                             arr5.push(item);
                             break;
-
-
                     }
 
 
                 })
                 this.setState({
-                    articledata: arr1,
                     shuzi: arr2,
                     jishu: arr3,
                     mishu: arr4,
-                    yance: arr5
-
+                    yance: arr5,
+                    departdata: arr3,
+                    departtitle: '技术部资源'
                 })
-
             })
             .catch(error => {
                 console.log(error);
             });
     }
+
+    // 请求公共资源部门数据
+    getdepart = (type) => {
+        axios.get(`association/resourcedata?type=${type}`)
+            .then(res => {
+                const arr2 = [];
+                const arr3 = [];
+                const arr4 = [];
+                const arr5 = [];
+                res.data.map(item => {
+                    switch (item.type) {
+                        case 2:
+                            arr2.push(item);
+                            break;
+                        case 3:
+                            arr3.push(item);
+                            break;
+                        case 4:
+                            arr4.push(item);
+                            break;
+                        case 5:
+                            arr5.push(item);
+                            break;
+                    }
+
+
+                })
+                this.setState({
+                    shuzi: arr2,
+                    jishu: arr3,
+                    mishu: arr4,
+                    yance: arr5,
+                    departdata: res.data
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    // 展示资源
+    showdepart = (e) => {
+        if (e.key === '1') {
+            this.getdepart(3)
+            this.setState({
+                departtitle: '技术部资源'
+            })
+        }
+        if (e.key === '2') {
+            this.getdepart(2)
+            this.setState({
+                departtitle: '数资部资源'
+            })
+        }
+        if (e.key === '3') {
+            this.getdepart(4)
+            this.setState({
+                departtitle: '秘书处资源'
+            })
+        }
+        if (e.key === '4') {
+            this.getdepart(5)
+            this.setState({
+                departtitle: '研策部资源'
+            })
+        }
+
+    }
+    // 修改page数据
+    pageonChange = (e) => {
+        console.log(JSON.parse(localStorage.getItem('article')))
+        this.getarticleData(e)
+    }
     render() {
-        const { visible, loading } = this.state;
+        const { visible, loading, total, limitSize } = this.state;
         return (
-            <div>
-                {/* 任务提醒 */}
-                <Button type="primary" onClick={this.showModal}>
-                    您有新任务
-                </Button>
+            <div className={style.homecontent}>
                 <Divider orientation="left">社团公共资源</Divider>
                 <div className={style.resourcecontent}>
-                    {/* 消息列表 */}
-                    <Card title="技术部资源" extra={<a href="#">More</a>} style={{ width: 300, margin: "5px" }}>
-                        {this.state.jishu.map(item => {
-                            return <p key={item.id}><a href={item.link} target="_blank">{item.title}</a></p>
-                        })}
-                    </Card>
-                    {/* 消息列表 */}
-                    <Card title="数资部资源" extra={<a href="#">More</a>} style={{ width: 300, margin: "5px" }}>
-                        {this.state.shuzi.map(item => {
-                            return <p key={item.id}><a href={item.link} target="_blank">{item.title}</a></p>
-                        })}
-                    </Card>
-                    {/* 消息列表 */}
-                    <Card title="研策部资源" extra={<a href="#">More</a>} style={{ width: 300, margin: "5px" }}>
-                        {this.state.yance.map(item => {
-                            return <p key={item.id}><a href={item.link} target="_blank">{item.title}</a></p>
-                        })}
-                    </Card>
-                    {/* 消息列表 */}
-                    <Card title="秘书处资源" extra={<a href="#">More</a>} style={{ width: 300, margin: "2px" }}>
-                        {this.state.mishu.map(item => {
-                            return <p key={item.id}><a href={item.link} target="_blank">{item.title}</a></p>
-                        })}
-                    </Card>
+                    <div className={style.leftresource}>
+                    <Layout className="site-layout-background" >
+                        <Sider className="site-layout-background" style={{maxWidth:'200px'}}>
+                            <Menu
+                                mode="inline"
+                                defaultSelectedKeys={['1']}
+                                defaultOpenKeys={['sub1']}
+                                style={{ height: '100%' }}
+                                onClick={this.showdepart}
+                            >
+                                <Menu.Item icon={<UserOutlined />} key="1" >技术部</Menu.Item>
+                                <Menu.Item icon={<LaptopOutlined />} key="2">数资部</Menu.Item>
+                                <Menu.Item icon={<NotificationOutlined />} key="3">秘书处</Menu.Item>
+                                <Menu.Item icon={<UserOutlined />} key="4">研策部</Menu.Item>
 
+                            </Menu>
+                        </Sider>
+                        <Departahow departtitle={this.state.departtitle} departdata={this.state.departdata} visible={visible} />
+                    </Layout>
+                    </div>
                 </div>
-
+                <div className={style.bottomstyle}>
                 <Divider orientation="left">社团推文</Divider>
                 <List
                     className={style.liststyle}
@@ -165,7 +254,7 @@ export default class Home extends React.Component {
                     renderItem={item => (
                         <List.Item>
                             <List.Item.Meta
-                                avatar={<Avatar href="../../../assets/photologo.png" />}
+                                avatar={<Avatar href={path} />}
                                 title={<a href={item.link} target="_blank">{item.title}</a>}
                                 description={item.uploadtime}
                             />
@@ -174,26 +263,8 @@ export default class Home extends React.Component {
                         </List.Item>
                     )}
                 />
-                <Modal
-                    visible={visible}
-                    title="工作安排"
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                    footer={[
-
-                        <Button key="submit" type="primary" loading={loading} onClick={this.handleOk}>
-                            确认收到
-                        </Button>,
-                        <Button key="back" onClick={this.handleCancel}>
-                            有事请假
-                        </Button>,
-
-                    ]}
-                >
-                    <p>社团活动物资组,工作内容</p>
-
-                </Modal>
-
+                <Pagination className={style.pagestyle} defaultCurrent={1} total={total} pageSize={limitSize} onChange={this.pageonChange} />
+                </div>
             </div>
         );
     }

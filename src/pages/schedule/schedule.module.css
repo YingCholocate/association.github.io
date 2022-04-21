@@ -1,4 +1,4 @@
-table {
+.diffen {
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
@@ -10,11 +10,11 @@ table {
   /* overflow-x: hidden; */
 }
 
-thead th:nth-child(1) {
+.theadstyle th:nth-child(1) {
   width: 5%;
 }
 
-table thead tr th {
+.theadstyle tr th {
   position: sticky;
   top: 0;
   background-color: whitesmoke;
@@ -27,12 +27,12 @@ table thead tr th {
   border: none;
 }
 
-th, td {
+.diffen th, td {
   padding: 20px;
-  border: 1.2px solid gray;
+  border: 1.2px solid rgba(128, 128, 128, 0.245);
 }
 
-th, td:first-child {
+.diffen th, .diffen td:first-child {
   position: sticky;
   left: 0;
   z-index: 1;
@@ -40,12 +40,12 @@ th, td:first-child {
   /* border: 1px solid gray; */
 }
 
-th:first-child {
+.diffen th:first-child {
   z-index: 2;
   background-color: whitesmoke;
 }
 
-.toright,.toleft {
+.toright, .toleft {
   width: 70px;
   height: 70px;
   background-color: rgba(128, 128, 128, 0.26);
@@ -63,12 +63,77 @@ th:first-child {
 
 .toright {
   position: absolute;
-  right: 0;
+  color: white;
+  right: 340px;
   top: 40%;
+  
 }
 
 .toleft {
   position: absolute;
   left: 5px;
   top: 40%;
+  color: white;
+}
+.toleftban{
+  display: none;
+}
+
+.tablecontent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leftcontent {
+  background-color: white;
+  margin: 10px;
+  min-width: 300px;
+  height: 72vh;
+  border:1px solid rgba(128, 128, 128, 0.159);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  
+}
+.usercontent{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: auto;
+  height: 100%;
+  border:1px solid rgba(128, 128, 128, 0.159);
+  overflow:auto;
+}
+.liststyle {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  flex: 1;
+  width: auto;
+  height: 100%;
+  border:1px solid rgba(128, 128, 128, 0.159);
+  cursor: pointer;
+}
+.liststyle:hover{
+  background-color: rgba(50, 166, 205, 0.241);
+}
+
+.headerstyle {
+  padding: 15px;
+  font: bold;
+  font-size: large;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+
+}
+
+.footerstyle{
+  width:inherit;
+  flex: 1;
+}
+.tdtext >td{
+  text-align: center;
 }

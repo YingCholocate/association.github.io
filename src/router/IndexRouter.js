@@ -29,8 +29,9 @@ export default function IndexRouter() {
                     </Route>
                     <Route path="/resource/Yance" element={<Yance />}></Route>
                     <Route path="/resource/Shuzi" element={<Shuzi />}></Route>
+                    {/* <Route path="/myself" element={<Myself/>}></Route> */}
                 </Route>
-
+               
             </Routes>
        
 

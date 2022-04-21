@@ -1,3 +1,4 @@
+// 折叠菜单栏，保证为纯函数
 export const CollapsedReducer = (prevState = {
     isCollapsed: false
 }, action) => {

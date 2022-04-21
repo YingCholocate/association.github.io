@@ -6,7 +6,6 @@ import { Layout,Spin } from 'antd';
 import style from './NewSandBox.module.css'
 import {connect} from  'react-redux'
 import Home from './Home';
-
 function NewSandBox(props) {
   const { Content } = Layout;
   return (
@@ -23,6 +22,7 @@ function NewSandBox(props) {
          
           }}
         >
+          {console.log(props.isLoading)}
            <Spin size="middle" spinning={props.isLoading}>
           <Outlet/>
           </Spin>

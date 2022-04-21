@@ -1,161 +1,281 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import * as XLSX from 'xlsx'
-import { Button, Popconfirm, Table, Switch, Select, Popover, Input, Form, DatePicker, Space } from 'antd';
+import { Button, Popconfirm, Modal, Radio, Tag, Table, Switch, Select, Popover, Dropdown, Input, Form, DatePicker, Space, Menu, message, Upload } from 'antd';
 import style from './mishu.module.css'
 import axios from 'axios';
-import getStoredState from 'redux-persist/es/getStoredState';
-import { useSearchParams } from 'react-router-dom';
-import { connectAdvanced } from 'react-redux';
+import { PlusOutlined, SwapOutlined, VerticalAlignBottomOutlined, SaveOutlined, EditOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { setBlockType } from 'draft-js/lib/DraftModifier';
+import { useNavigate } from 'react-router-dom'
 const { Option } = Select;
 export default function Mishu() {
+  // title标签
+  const [title, settitle] = useState('普通活动人员安排')
+  // 改变日期
+  const [time, settime] = useState('');
+  const ondateChange = (value) => {
+    localStorage.setItem('time', value)
+    settime(value);
+    message.info('自动筛选当天有课人员成功!')
+  }
+  // 初始摊位数据
   const [tanweidata, settanweidata] = useState([
-    { time: '8：00-10:00', person: "", content: '', notice: '' },
-    { time: '10：00-12:00', person: "", content: '', notice: '' },
-    { time: '12:00-14:00', person: "", content: '', notice: '' },
-    { time: '14:00-16:00', person: "", content: '', notice: '' },
-    { time: '16:00-17:40', person: "", content: '', notice: '' },
-    { time: '17:40-18:00', person: "", content: '', notice: '' },
+    { 时间: '8：00-10:00', 内容: '', 人员: "", 注意事项: '', key: 0 },
+    { 时间: '10：00-12:00', 内容: '', 人员: "", 注意事项: '', key: 1 },
+    { 时间: '12:00-14:00', 内容: '', 人员: "", 注意事项: '', key: 2 },
+    { 时间: '14:00-16:00', 内容: '', 人员: "", 注意事项: '', key: 3 },
+    { 时间: '16:00-17:40', 内容: '', 人员: "", 注意事项: '', key: 4 },
+    { 时间: '17:40-18:00', 内容: '', 人员: "", 注意事项: '', key: 5 },
   ])
+  // 初始摊位列数据
   const [tanweicoldata, settanweicoldata] = useState([
     {
       id: 'time',
-      title: '时间'
+      title: '时间',
+      type: "input",
+      dataIndex: '时间',
+      key: '时间'
     }, {
       id: 'content',
-      title: '内容'
-    }, 
+      title: '内容',
+      type: "input",
+      dataIndex: '内容',
+      key: '时间'
+    },
     {
       id: 'person',
-      title: '人员'
+      title: '人员',
+      type: "select",
+      dataIndex: '人员',
+      key: '人员'
     }, {
       id: 'notice',
-      title: '注意事项'
+      title: '注意事项',
+      type: 'input',
+      dataIndex: '注意事项',
+      key: '注意事项'
     },
 
   ])
-  const initialdata = [
-    { 组别: '技术组', 事项: '调试现场设备，调试摄像设备', 负责人: '', 成员: '' },
-    { 组别: '物资组', 事项: '清点物资', 负责人: '', 成员: '' },
-    { 组别: '控场组', 事项: '维持活动现场秩序（入场、活动过程中及出场）', 负责人: '', 成员: '' },
-    { 组别: '工作人员签到组', 事项: '负责工作人员签到', 负责人: '', 成员: '' },
-    { 组别: '活动报名负责组', 事项: 'Python训练营的报名', 负责人: '', 成员: '' },
-    { 组别: '布场、清场组', 事项: '布置、清理场地', 负责人: '', 成员: '' }
+  // 初始普通活动数据
+  const [initialdata, setinialdata] = useState([
+    { 组别: '技术组', 事项: '调试现场设备，调试摄像设备', 负责人: '', 成员: '', key: 0 },
+    { 组别: '物资组', 事项: '清点物资', 负责人: '', 成员: '', key: 1 },
+    { 组别: '控场组', 事项: '维持活动现场秩序（入场、活动过程中及出场）', 负责人: '', 成员: '', key: 2 },
+    { 组别: '工作人员签到组', 事项: '负责工作人员签到', 负责人: '', 成员: '', key: 3 },
+    { 组别: '活动报名负责组', 事项: 'Python训练营的报名', 负责人: '', 成员: '', key: 4 },
+    { 组别: '布场、清场组', 事项: '布置、清理场地', 负责人: '', 成员: '', key: 5 }
 
-  ]
-  const initialcoldata = [
+  ])
+  // 初始普通活动数据
+  const [initialcoldata, setinialcoldata] = useState([
     {
       id: "group",
-      title: "组别"
+      title: "组别",
+      type: "input",
+      dataIndex: "组别",
+      key: '组别'
     },
     {
       id: "notice",
-      title: '事项'
+      title: '事项',
+      type: "input",
+      dataIndex: "事项",
+      key: '事项'
     },
     {
       id: 'principal',
-      title: '负责人'
+      title: '负责人',
+      dataIndex: "负责人",
+      key: '负责人',
+      type: "select"
     }, {
       id: 'member',
-      title: '成员'
+      title: '成员',
+      dataIndex: "成员",
+      key: '成员',
+      type: "select"
     }
-  ]
-  const [importExcel, setimportExcel] = useState(initialdata)
-  const [coldata, setcoldata] = useState(initialcoldata)
-  const [title, settitle] = useState('普通活动人员安排')
-  const arr = [...importExcel];
-  arr.pop()
+  ])
+  // 展示的数据
+  const [importExcel, setimportExcel] = useState([...initialdata])
+  const [coldata, setcoldata] = useState([...initialcoldata])
+  // 临时数据
+  const [normaldata, setnormaldata] = useState([...initialdata])
+  const [normalcol, setnormalcol] = useState([...initialcoldata])
+  const [tanwetempdata, settanwetempdata] = useState([...tanweidata])
+  const [tanwetempcol, settanwetempdatacol] = useState([...tanweicoldata])
+  // 用户信息
   const [userdata, setuserdata] = useState(() => {
     let userotherdata = []
     axios.get('/association/users?method=getall')
       .then(res => {
-
         res.data.map((item, index) => {
-          userotherdata.push(item.username + item.role[0]['rolevalue'])
+          userotherdata.push([item.username + item.role[0]['rolevalue'], item.number])
         })
-
+        // console.log(userotherdata)
+        localStorage.setItem('alluser', JSON.stringify(userotherdata))
       }
-
       )
     return userotherdata
   }
 
   )
-  const [showimportExcel, setshowimportExcel] = useState(arr)
+  // 添加部门
+  const adddepartment = (item, colorarr) => {
 
-  const [newdataSource, setnewdataSource] = useState(importExcel);
-  const [time, settime] = useState('');
+    let rolename = item.role[0]['rolevalue']
+    if (rolename == '数资部工作人员') {
+      colorarr.push('blue')
+    } else if (rolename == '技术部工作人员') {
+      colorarr.push('green')
+    } else if (rolename == '秘书处工作人员') {
+      colorarr.push('pink')
+    } else if (rolename == '研策部工作人员') {
+      colorarr.push('purple')
+    } else {
+      colorarr.push('gold')
+    }
+    setcolor([...colorarr])
+  }
+  // 添加一列的key值
+  const [colkey, setcolkey] = useState([])
+  // 现在输入的值
+  const [key, setkey] = useState('')
+  // 向服务器请求工作人员的名称
+  useEffect(() => {
+    axios.get('/association/users?method=getall')
+      .then(res => {
+        let userotherdata = [];
+        let colorarr = [];
+        res.data.map(item => {
+          adddepartment(item, colorarr)
+
+          userotherdata = [...userotherdata, (item.username + item.role[0]['rolevalue'])]//Todo
+        })
+        setuserdata([...userotherdata])
+      }
+
+      )
+  }, [])
+  // 设置文件名
+  const [filename, setfilename] = useState("")
+  // 
+  const [newdataSource, setnewdataSource] = useState([...importExcel]);
+  // 设置select默认值
+  const [normaldefault, setnormaldefault] = useState([])
+  const [tanweidefault, settanweidefault] = useState([])
+  // 设置筛选好有课的人员
   const [person, setperson] = useState([])
-  const [freearr, setfreearr] = useState([])
-  const dataRef = useRef();
+  // 设置标签颜色
+  const [color, setcolor] = useState([]);
+  // select默认值
+  const [newimportExcel, setnewimportExcel] = useState([])
+  // 设置输入框的value
+  const [inputvalue, setinputvalue] = useState("")
+  const [newlastimportExcel, setnlimportExcel] = useState([])
+  // 设置是否被点击删除
+  const [clicked, setclicked] = useState(false);
+  const [coll, setcoll] = useState([])
+
+  // 获取缓存是否有数据，没有则使用原始数据
+  const getnormalStorage = () => {
+    if (localStorage.getItem('inialdata')) {
+      const inialdata = JSON.parse(localStorage.getItem('inialdata'));
+      const inialcoldata = JSON.parse(localStorage.getItem('inialcoldata'))
+      setimportExcel([...inialdata])
+      setcoldata([...inialcoldata])
+    }
+  }
+  const gettanweiStorage = () => {
+    if (localStorage.getItem('tanweidata')) {
+      const inialdata = JSON.parse(localStorage.getItem('tanweidata'));
+      console.log(JSON.parse(localStorage.getItem('tanweidata')))
+      const inialcoldata = JSON.parse(localStorage.getItem('tanweicoldata'))
+      setimportExcel([...inialdata])
+      setcoldata([...inialcoldata])
+    }
+  }
+  useEffect(() => {
+    if (title === "普通活动人员安排") {
+      getnormalStorage()
+    } else {
+      gettanweiStorage()
+    }
+
+  }, [])
   // 获取工作成员的课表得到某时刻无法工作的人员
   useEffect(() => {
-    axios.get(`http://localhost:5000/course?_embed=usercourse`).then(res => {
+    axios.get(`/association/course?method=getall`).then(res => {
       let zc = 1;
       if (time) {
         let timedate = new Date(time);
+
         let oneDayTime = 1000 * 60 * 60 * 24
         let fidate = JSON.parse(localStorage.getItem('fidate'));
         let xq = timedate.getDay();
-        console.log(timedate.getTime())
         let firsttimedate = timedate.getTime() - oneDayTime * (xq - 1);
         let newtimedate = new Date(firsttimedate);
-        console.log(newtimedate.getDate())
+        console.log("timedate", newtimedate)
         fidate.map((item, i) => {
           let first = new Date(item);
-          if (first.toDateString() === timedate.toDateString()) {
+          if (first.toDateString() === newtimedate.toDateString()) {
             zc = i + 1;
           }
         })
+
         let zcarr = [];
-        let arr = [];
+        let arr = [];//ToDO
         res.data.map((item, index) => {
-          // console.log(item)
-          item.coursealldata.map(ii => {
-            if (ii.zc == zc && ii.xq == xq) {
-
-              zcarr.push([ii])
-              arr.push(item.usercourse[0].number)
-            }
-
-          })
+          let zcstart = item.cd[0].zc.split(',')
+          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq == xq)) {
+            zcarr.push(item)
+            arr.push(item.stuid)
+          }
         })
         // 符合周次和星期的课表详情
-        console.log(zcarr)
+        console.log("zvarr", zcarr)
         function unique(arr) {
           return arr.reduce((prev, cur) => prev.includes(cur) ? prev : [...prev, cur], []);
         }
-        // 其中的用户的名称
-        console.log(unique(arr))
+
         let newarr = []
         let usernamearr = []
         // 创建二维数组存储有课的工作人员
-        let personarr = Array.from(Array(5), () => new Array(0))
+        console.log(",,,", [...userdata])
+        let personarr = Array.from(Array(tanweidata.length), () => new Array(...userdata))
         for (let i = 0; i < zcarr.length; i++) {
           let username = "";
           axios.get('/association/users?method=getone', {
             params: {
-              number: arr[i]
+              number: zcarr[i].stuid
             }
           }).then(res => {
-            console.log(res.data)
+            zcarr[i] = [zcarr[i], res.data.username + res.data.role[0].rolevalue]
+            let username = res.data.username + res.data.role[0].rolevalue;
             if (res.data.department != 1) {
-              username = res.data.username;
-              usernamearr.push(username)
-              // console.log(username)
-              newarr.push([zcarr[i], username])
-              console.log(newarr)
               // 將其放入对应的时间节次
-              let jc = [1, 3, 6, 8, 10]
+              let jc = [1, 3, 6, 8]
               jc.map((j, index) => {
-                console.log(zcarr[i][0])
-                if (zcarr[i][0].jcdm2) {
-                  let a = zcarr[i][0].jcdm2.split(',');
-                  console.log(a)
-                  console.log(j);
-                  if (parseInt(a[0]) == j) {
-                    console.log("bigo")
-                    personarr[index].push(username);
-                    // console.log(personarr)
+                if (zcarr[i][0].cd[0].jcdm2) {
+                  let a = zcarr[i][0].cd[0].jcdm2.split(',');
+                  if (parseInt(a[0]) === j) {
+                    if (j === 1) {
+                      const idx = personarr[0].findIndex(item => item === username)
+                      personarr[0].splice(idx, 1)
+                    }
+                    if (j === 3) {
+                      const idx = personarr[1].findIndex(item => item === username)
+                      personarr[1].splice(idx, 1)
+                    }
+                    if (j === 6) {
+                      const idx = personarr[3].findIndex(item => item === username)
+                      personarr[3].splice(idx, 1)
+                    }
+                    if (j === 8) {
+                      const idx = personarr[4].findIndex(item => item === username)
+                      personarr[4].splice(idx, 1)
+                    }
+
                   }
                 }
               })
@@ -164,87 +284,414 @@ export default function Mishu() {
             }
 
           }).then(res => {
-            console.log([...personarr])
             setperson([...personarr]);
           }
           )
-
         }
       }
     })
   }, [time])
 
-
-  // TODO
-  useEffect(() => {
-    let freearr = Array.from(Array(5), () => new Array([...userdata]))
-
-    // console.log(freeuserdata)
-    // console.log(freeuserdata[0].indexOf('admin'))
-    console.log(freearr);
-    freearr.map((items, index) => {
-      console.log(items)
-      items.map((it) => {
-        console.log(it)
-        console.log('t', index)
-        it.map((ii, i) => {
-          console.log(ii)
-          console.log(i)
-          console.log(person[index]);
-          if (ii.indexOf(person[index]) > -1) {
-            console.log('..1')
-            let freeuserdata = [...userdata]
-            freeuserdata.pop(ii);
-            console.log(freeuserdata)
-            freearr[index][i] = freeuserdata
-          }
-        })
-      })
-      // defaultarr = freeuserdata.filter((item, index) => {
-      //   console.log(person[index])
-      //   if (person[index].length > 0) {
-      //     console.log('...');
-      //     return !(item.indexOf(person[index]) >= 0)
-      //   }
-      //   return true
-      // }
-      // )
-      // console.log("defaultarr", defaultarr)
-      // items = defaultarr;
-    })
-
-    setfreearr(freearr)
-  }, [person])
-
-  useEffect(() => {
-    dataRef.current = importExcel;
-  }, [importExcel])
-  // 向服务器请求工作人员的名称
-  useEffect(() => {
-    axios.get('/association/users?method=getall')
-      .then(res => {
-        let userotherdata = []
-        res.data.map(item => {
-          userotherdata.push(item.username + item.role[0]['rolevalue'])
-        })
-        setuserdata([...userotherdata])
-      }
-
-      )
-  }, [])
-
+  const inputEl = useRef(null);
+  const selectRef = useRef(null);
   // 删除一行
-  const handleDelete = (e, col) => {
-    console.log(col)
-    const dataSource = [...importExcel];
-    let da = dataSource.filter((item, index) => {
-      return index !== col
+  const handleDelete = (e, coll) => {
+    let list = importExcel.concat();
+    let da = list.filter((item, index) => {
+      return item.key !== coll
     }
     )
+    console.log("da", da)
+    console.log([...da])
+    setcoll([...da])
     setimportExcel([...da])
-    setnewdataSource([...da]);
+    setnormaldata([...da])
+    setclicked(true)
+    setEditable(true)
+
+  };
+  useEffect(() => {
+    let list = document.getElementsByTagName("p");
+    if (list) {
+      for (let i = 0; i < list.length; i++) {
+        list[i].innerHTML = ""
+      }
+      console.log("qingk")
+      // handleDelete
+
+    }
+    console.log(clicked)
+    if (clicked) {
+
+      console.log("coll", [...coll])
+      setimportExcel([...coll])
+      setnormaldata([...coll])
+      message.info('删除成功,可继续编辑')
+      console.log("new", importExcel)
+      setclicked(false)
+    }
+    setnewimportExcel([...importExcel])
+    console.log(importExcel)
+
+  }, [importExcel])
+
+  // 输入框变动
+  const handletextchange = (e) => {
+    let attrarr = e.target.attributes[1].value.split(',')
+    console.log(attrarr)
+    let rowindex = attrarr[0];
+    let colindex = attrarr[1];
+    // if (title === '普通活动人员安排') {
+    let tempdata = [...importExcel]
+    tempdata.map((item, index) => {
+      if (rowindex == index) {
+        item[colindex] = e.target.innerText
+      }
+    })
+    console.log(e)
+    let str = e.target.innerHTML.toString()
+    //  else{
+    // e.target.innerHTML=`<p>${e.target.innerText}</p>`
+    // }
+    // if (str.indexOf('div') !== -1) {
+    //   setimportExcel([...tempdata])
+    // }
+
+
+
+    // } else {
+    //   let dataarr = Object.keys(tanwetempdata[rowindex]);
+
+    //   tanwetempdata.map((item, index) => {
+    //     // console.log(rowindex, index, item.key)
+    //     // console.log(rowindex == index && item.key == index)
+    //     if (rowindex == index && item.key == index) {
+    //       item = item[dataarr[colindex]] = e.target.innerText
+    //     }
+
+    //   })
+    //   console.log("tanwetempdata", tanwetempdata)
+    // setimportExcel([...tanwetempdata])
+
+    // }
+
+
+  }
+
+  // 导出数据
+  const handleExport = (headers, data, fileName = title + '.xlsx') => {
+    // setimportExcel([...importExcel])
+    console.log([...importExcel])
+    headers = [...coldata];
+    data = [...importExcel];
+    console.log(data)
+    console.log(headers)
+    const _headers = headers
+      .map((item, i) => Object.assign({}, { id: item.key, title: item.title, position: String.fromCharCode(65 + i) + 1 }))
+      .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { id: next.id, v: next.title } }), {});
+    console.log(_headers)
+    const _data = data
+      .map((item, i) => headers.map((key, j) =>
+        Object.assign({}, { content: item[key.title], position: String.fromCharCode(65 + j) + (i + 2) })
+      ))
+
+      // 对刚才的结果进行降维处理（二维数组变成一维数组）
+      .reduce((prev, next) => prev.concat(next))
+      // 转换成 worksheet 需要的结构
+      .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.content } }), {});
+    console.log("_data", _data)
+    // 合并 headers 和 data
+    const output = Object.assign({}, _headers, _data);
+    // 获取所有单元格的位置
+    const outputPos = Object.keys(output);
+    // 计算出范围 ,["A1",..., "H2"]
+    const ref = `${outputPos[0]}:${outputPos[outputPos.length - 1]}`;
+
+    // 构建 workbook 对象
+    const wb = {
+      SheetNames: ['mySheet'],
+      Sheets: {
+        mySheet: Object.assign(
+          {},
+          output,
+          {
+            '!ref': ref,
+            '!cols': [{ wpx: 45 }, { wpx: 100 }, { wpx: 200 }, { wpx: 80 }, { wpx: 150 }, { wpx: 100 }, { wpx: 300 }, { wpx: 300 }],
+          },
+        ),
+      },
+    };
+
+    // 导出 Excel
+    XLSX.writeFile(wb, fileName);
+
+  }
+  // 添加一行
+  const handleAdd = () => {
+    const newData = {}
+    console.log("coldata", coldata)
+    coldata.map(item => {
+      newData[item.title] = '';
+    })
+    newData['key'] = importExcel.length
+    console.log(newData)
+    // setnewdataSource(() => [...importExcel, newData])
+    setimportExcel(() => [...importExcel, newData])
+    setEditable(true)
+    // handleSave()
+  }
+  // 添加一列
+  const handleAddcolumn = (key) => {
+    console.log("key", key)
+    setcolkey([...colkey, key.title])
+    let newcol = {}
+    if (key.radio == '1') {
+      newcol = {
+        id: key.title,
+        key: key.title,
+        title: key.title,
+        dataIndex: key.title,
+        type: "select"
+      }
+    } else {
+      newcol = {
+        id: key.title,
+        key: key.title,
+        title: key.title,
+        dataIndex: key.title,
+        type: "input"
+      }
+    }
+
+    setcoldata([...coldata, newcol])
+    importExcel.map(item => {
+      item[key.title] = ''
+    })
+    console.log(importExcel)
+    setimportExcel([...importExcel])
+    if (title == "普通人员活动安排") {
+      setnormaldata([...importExcel])
+      setnormalcol([[...coldata, newcol]])
+    } else {
+      settanwetempdata([...tanwetempdata])
+      settanwetempdatacol([...coldata, newcol])
+    }
+    setEditable(true)
+    handleCancel()
+  }
+
+  // 改变select的值
+  const handleselectChange = (value, op) => {
+    console.log("op", op)
+    let newimportExcel = []
+    console.log(op[0])
+    if (JSON.stringify(op[0]) == "{}") {
+      newimportExcel.push(value[0])
+    }
+
+    op.map((item, i) => {
+      if (JSON.stringify(item) !== "{}")
+        newimportExcel.push(item.children)
+
+    })
+    console.log(newimportExcel)
+    // setnewimportExcel([...newimportExcel])
+    // if (title == "普通活动人员安排") {
+    op.map((item, i) => {
+      if (JSON.stringify(item) !== "{}") {
+        let temp = [...importExcel];
+        console.log(op[0].name)
+        let row = 0;
+        console.log('im', [...importExcel])
+        importExcel.map((item, index) => {
+          if (item.key === op[0].name[0])
+            row = index
+        })
+        console.log(row, temp)
+        temp[row][op[0].name[1]] = newimportExcel.toString()
+
+        // setnormaldata([...temp]);
+        console.log(temp);
+        // setimportExcel([...temp]);
+      }
+      else {
+        item[0] = value[0]
+      }
+    })
+    // } else {
+    //   op.map((item, i) => {
+    //     let temp = [...tanwetempdata]
+    //     if (JSON.stringify(item) !== "{}") {
+    //       console.log(op[0].name)
+    //       let row = 0;
+    //       importExcel.map((item, index) => {
+    //         if (item.key === op[0].name[0])
+    //           row = index
+    //       })
+    //       temp[row][op[0].name[1]] = newimportExcel.toString()
+    //     }
+    //     else {
+    //       item[0] = value[0]
+    //     }
+    //     // settanwetempdata([...tanwetempdata]);
+    //     console.log("newda", temp);
+    //     // setimportExcel([...tanwetempdata]);
+    //   })
+    //   // settanwetempdata([...tanwetempdata])
+    // }
+    console.log(importExcel);
+
+  }
+  // 改变模板
+  const handleModuleChange = (e) => {
+    if (title === e.target.innerHTML) return
+
+    if (e.target.innerHTML === '摊位人员安排') {
+      if (localStorage.getItem('tanweidata')) {
+        gettanweiStorage()
+      } else {
+        console.log([...tanweidata])
+        setimportExcel([...tanweidata])
+        setcoldata([...tanweicoldata])
+
+      }
+      settitle('摊位人员安排')
+      setEditable(true)
+
+    }
+    if (e.target.innerHTML === '普通活动人员安排') {
+      if (localStorage.getItem('inialdata')) {
+        getnormalStorage()
+      } else {
+        console.log(initialcoldata)
+        setimportExcel([...initialdata])
+        setcoldata([...initialcoldata])
+
+        setnormaldefault([...newimportExcel])
+        settanweidefault([...newimportExcel])
+
+      }
+      settitle('普通活动人员安排')
+      setEditable(true)
+    }
+    message.info("切换成功！")
+  }
+
+  // 保存为新模板
+  const handleSave = () => {
+    console.log("importExcel", importExcel)
+    console.log(coldata)
+
+    if (title == "普通活动人员安排") {
+      setinialdata([...importExcel])
+      setinialcoldata([...coldata])
+      localStorage.setItem('inialdata', JSON.stringify([...importExcel]))
+      localStorage.setItem('inialcoldata', JSON.stringify([...coldata]))
+    } else {
+      settanweidata([...importExcel])
+      settanweicoldata([...coldata])
+      localStorage.setItem('tanweidata', JSON.stringify([...importExcel]))
+      localStorage.setItem('tanweicoldata', JSON.stringify([...coldata]))
+    }
+
+
+  }
+  const navigate = useNavigate();
+  // 清空重写
+  const handleaddnew = () => {
+
+    if (title == '普通活动人员安排') {
+
+      setnormalcol([...initialcoldata])
+      setnormaldata([...initialdata])
+      setimportExcel([...initialdata])
+      setcoldata([...initialcoldata])
+    } else {
+      setimportExcel([...tanweidata])
+      setcoldata([...tanweicoldata])
+    }
+  }
+  // menu下拉菜单
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <div onClick={handleModuleChange} >摊位人员安排</div>
+      </Menu.Item>
+
+      <Menu.Item key="2">
+        <div onClick={handleModuleChange}>普通活动人员安排</div>
+      </Menu.Item>
+
+    </Menu>
+  );
+  const initialmenu = (
+    <Menu>
+      <Menu.Item key="1">
+        <div onClick={handleaddnew} >摊位人员安排</div>
+      </Menu.Item>
+
+      <Menu.Item key="2">
+        <div onClick={handleaddnew}>普通活动人员安排</div>
+      </Menu.Item>
+
+    </Menu>
+  );
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
   };
 
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const [form] = Form.useForm();
+  // 标签栏的颜色
+  function tagRender(props) {
+    const { label, value, closable, onClose } = props;
+    const onPreventMouseDown = event => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    return (
+      <Tag
+        color={color[value]}
+        onMouseDown={onPreventMouseDown}
+        closable={closable}
+        onClose={onClose}
+        style={{ marginRight: 3 }}
+      >
+        {label}
+      </Tag>
+    );
+  }
+  const [Editable, setEditable] = useState(true)
+  const [columns, setcolumns] = useState([])
+  const [data, setdata] = useState([])
+  console.log('全局2', importExcel)
+  const tableonFinish = (values) => {
+    setEditable(false)
+    const newcolumns = [...coldata, {
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <Space size="middle">
+          <Popconfirm title="Sure to delete?" onConfirm={(e) => handleDelete(e, record.key)}>
+            <a>Delete</a>
+          </Popconfirm>
+        </Space>
+      ),
+    }]
+    console.log(newcolumns)
+    setcolumns([...newcolumns])
+    setimportExcel([...importExcel])
+
+  }
+
+  const changetoEdit = () => {
+    setEditable(true)
+  }
   // 导入数据
   const handlechange = (obj) => {
     console.log(obj.target.files)
@@ -289,280 +736,238 @@ export default function Mishu() {
     reader.readAsBinaryString(file[0]);
 
   }
-  // 输入框变动
-  const handletitlechange = (e) => {
-    let newcoldata = []
-    let titleid = e.target.attributes[1].value
-    let oldkey = coldata[titleid].title
-    coldata.map((item, index) => {
-      if (index == titleid) {
-        newcoldata[index] = { ...item, title: e.target.innerHTML }
-        // newcoldata[index].title=e.target.innerHTML;
-        console.log(newcoldata)
-      } else {
-        newcoldata[index] = { ...item }
-      }
-
-    })
-    console.log(newcoldata)
-    let newtitle = newcoldata[titleid];
-    setcoldata([...newcoldata])
-    let result = importExcel.map(item => {
-      var obj = {
-        ...item,
-        newtitle: item[oldkey]
-      }
-      // obj[newtitle]='zu'
-      return obj
-    }
-    )
-    console.log(result)
-    setimportExcel([...result])
-  }
-  const handletextchange = (e) => {
-
-    let attrarr = e.target.attributes[1].value.split(',')
-    let rowindex = attrarr[0];
-    let colindex = attrarr[1];
-    let dataarr = Object.keys(newdataSource[rowindex]);
-    newdataSource[rowindex][dataarr[colindex]] = e.target.innerHTML;
-    setnewdataSource([...newdataSource]);
-    console.log(newdataSource)
-    setimportExcel([...newdataSource])
-  }
-  // 导出数据
-  const handleExport = (headers, data, fileName = '记录表.xlsx') => {
-    setimportExcel(newdataSource);
-    headers = coldata;
-    data = importExcel;
-    console.log(headers)
-    const _headers = headers
-      .map((item, i) => Object.assign({}, { key: item.key, title: item.title, position: String.fromCharCode(65 + i) + 1 }))
-      .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { key: next.key, v: next.title } }), {});
-
-    const _data = data
-      .map((item, i) => headers.map((key, j) =>
-        Object.assign({}, { content: item[key.title], position: String.fromCharCode(65 + j) + (i + 2) })
-      ))
-      // 对刚才的结果进行降维处理（二维数组变成一维数组）
-      .reduce((prev, next) => prev.concat(next))
-      // 转换成 worksheet 需要的结构
-      .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.content } }), {});
-
-    // 合并 headers 和 data
-    const output = Object.assign({}, _headers, _data);
-    // 获取所有单元格的位置
-    const outputPos = Object.keys(output);
-    // 计算出范围 ,["A1",..., "H2"]
-    const ref = `${outputPos[0]}:${outputPos[outputPos.length - 1]}`;
-
-    // 构建 workbook 对象
-    const wb = {
-      SheetNames: ['mySheet'],
-      Sheets: {
-        mySheet: Object.assign(
-          {},
-          output,
-          {
-            '!ref': ref,
-            '!cols': [{ wpx: 45 }, { wpx: 100 }, { wpx: 200 }, { wpx: 80 }, { wpx: 150 }, { wpx: 100 }, { wpx: 300 }, { wpx: 300 }],
-          },
-        ),
-      },
-    };
-
-    // 导出 Excel
-    XLSX.writeFile(wb, fileName);
-  }
-  // 添加一行
-  const handleAdd = () => {
-    const newData = {}
-    coldata.map(item => {
-      newData[item.title] = ''
-    })
-
-
-    setnewdataSource(() => [...importExcel, newData])
-    setimportExcel(() => [...importExcel, newData])
-  }
-  // 添加一列
-  const handleAddcolumn = (key) => {
-    console.log(key)
-    setcoldata([...coldata, key])
-    console.log(coldata)
-    newdataSource.map(item => {
-      item[key.title] = ''
-    })
-    setimportExcel([...newdataSource])
-  }
-  // 改变select的值
-  const handleselectChange = (value, op) => {
-    console.log(op)
-    let rowindex = op[0].name[0];
-    let colindex = op[0].name[1];
-
-    let dataarr = Object.keys(newdataSource[rowindex]);
-    newdataSource[rowindex][dataarr[colindex]] = op[0].children
-    setnewdataSource([...newdataSource]);
-    console.log(newdataSource);
-    setimportExcel([...newdataSource]);
-  }
-  // 改变模板
-  const handleModuleChange = () => {
-    if (title === '摊位人员安排') {
-      // console.log([...initialdata])
-      setimportExcel([...initialdata])
-      setcoldata([...initialcoldata])
-      settitle('普通活动人员安排')
-    }
-    if (title === '普通活动人员安排') {
-      setimportExcel([...tanweidata])
-      setcoldata([...tanweicoldata])
-      settitle('摊位人员安排')
-    }
-
-  }
-  const ondateChange = (value) => {
-    console.log(value)
-    localStorage.setItem('time', value)
-    settime(value);
-  }
-  const content = () => {
-    return <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      initialValues={{ remember: true }}
-      onFinish={handleAddcolumn}
-      autoComplete="off"
-    >
-      <Form.Item
-        label="title"
-        name="title"
-        rules={[{ required: true, message: 'Please input your colname!' }]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
-
-
-  }
   return (
-    <div>
-      <form encType="multipart/form-data">
-        <div className={style.topstyle}>
-          <input type="file" onChange={handlechange} />
+    <div className={style.tablecontentstyle}>
+      <div className={style.titlestyle}>
+        <div className={style.filetypestyle}>
+          <span className={style.biggertext}>当前为</span><span className={style.titletext}>{title}</span>
+        </div>
+        {title === '普通活动人员安排' ?
+          ""
+          : <Space direction="vertical" className={style.datestyle}>
+            <DatePicker onChange={ondateChange} />
+          </Space>
+        }
+      </div>
+      <div className={style.container}>
 
-          <div className={style.buttonpanel}>
-            <div className={style.filetypestyle}>当前为{title}</div>
-            <Button type="primary" onClick={handleModuleChange}>更改此位模板</Button>
+        {Editable ?
 
-            <Space direction="vertical" className={style.datestyle}>
-              <DatePicker onChange={ondateChange} />
-            </Space>
-            <Button type="primary" onClick={handleExport}>保存导出</Button>
-            <Button
-              onClick={handleAdd}
-              type="primary"
-              style={{
-                marginBottom: 16,
-              }}
-            >
-              Add a row
-            </Button>
-            <Popover content={content} title="Title">
+          <Form onFinish={tableonFinish}>
+            <div className={style.topstyle}>
+              <Dropdown overlay={menu} placement="bottomLeft" arrow>
+                <Button type="primary" ><SwapOutlined />切换模板</Button>
+              </Dropdown>
+              <Button  type="primary" htmlType="submit">
+                <FileExcelOutlined /> 查看效果
+              </Button>
+
+
+
+              <Button type="primary" onClick={handleExport}><VerticalAlignBottomOutlined />导出</Button>
+              <Button type="primary" onClick={handleSave}><SaveOutlined />保存为新模板</Button>
+
+
+            </div>
+            <Form.Item name="table">
+              <table className={style.tablestyle}>
+                <thead className={style.theadstyle}>
+                  <tr>
+                    {/* {console.log("渲染", importExcel)} */}
+                    {
+                      coldata ?
+                        (coldata.map((item, index) => {
+                          return <th key={index}>
+                            {item.title}
+
+                          </th>
+                        }))
+                        : <th></th>
+                    }
+                    {/* {<th>编辑</th>} */}
+                  </tr>
+
+                </thead>
+                <tbody>
+
+                  {
+
+                    importExcel ?
+                      (importExcel.map((items, row) => {
+                        return <tr key={row + items}>
+
+                          {
+
+                            Object.keys(items).map((keys, col) => {
+                              if (keys !== 'key') {
+                                let cindex
+
+                                coldata.map((c, i) => {
+                                  if (c.title === keys) {
+
+                                    cindex = i
+                                  }
+                                })
+
+                                return (
+                                  <td key={keys + col}>
+                                    {
+                                      (coldata[cindex].type === 'select') ?
+                                        title === '普通活动人员安排' || !person[row] ?
+                                          // coldata[col].title === '成员' ?
+                                          <Select
+                                            tagRender={tagRender}
+                                            mode="multiple"
+                                            allowClear
+                                            style={{ width: '100%' }}
+                                            placeholder="Please select"
+                                            onChange={handleselectChange}
+                                            defaultValue={items[coldata[cindex].title] ? items[coldata[cindex].title] : undefined}
+                                            name={[row, col]}
+                                            autoClearSearchValue={true}
+                                            ref={selectRef}
+                                          >
+                                            {userdata.map((item, index) => {
+                                              return <Option name={[items.key, coldata[cindex].title]} key={index} >
+                                                {item}
+                                              </Option>
+                                            })}
+                                          </Select>
+                                          :
+                                          <Select
+                                            tagRender={tagRender}
+                                            mode="multiple"
+                                            allowClear
+                                            style={{ width: '100%' }}
+                                            placeholder="Please select"
+                                            onChange={handleselectChange}
+                                            name={[row, col]}
+                                            defaultValue={tanweidefault}
+                                          >
+                                            {console.log("tanweidefault", tanweidefault)}
+                                            {person[row].map((item, index) => {
+                                              return <Option name={[items.key, coldata[cindex].title]} key={index} >
+                                                {item}
+                                              </Option>
+                                            })
+
+                                            })
+                                          </Select>
+                                        :
+                                        <div ref={inputEl} className={style.tableinput} name={[items.key, coldata[cindex].title]} suppressContentEditableWarning contentEditable="true" onInput={(e) => handletextchange(e)}>
+                                          {/* {console.log(items[keys])} */}
+                                          {items[keys] ? <div>{items[keys]}</div> : <p>{items[keys]}</p>}
+                                        </div>
+
+                                    }
+
+                                  </td>)
+                              }
+
+
+                            })
+                          }
+                          {/* {
+                            // <td><input type="reset"></input></td>
+                            <td><Popconfirm title="Sure to delete?" onConfirm={(e) => handleDelete(e, items.key)}>
+                              <a>Delete</a>
+                            </Popconfirm></td>
+                          } */}
+                        </tr>
+
+                      }))
+                      :
+                      <tr><td>空</td></tr>
+                  }
+
+                </tbody>
+              </table>
+            </Form.Item>
+
+          </Form> :
+          <div className={style.container}>
+            <div className={style.topstyle}>
+              <Button type="primary" onClick={changetoEdit}><EditOutlined />进入编辑</Button>
               <Button
-
+                onClick={handleAdd}
                 type="primary"
                 style={{
                   marginBottom: 16,
                 }}
               >
-                Add a column
+
+                <PlusOutlined />增添一行
               </Button>
-            </Popover>
+              <Modal title="增添列" visible={isModalVisible} onOk={() => {
+                form
+                  .validateFields()
+                  .then((values) => {
+                    form.resetFields();
+                    handleAddcolumn(values);
+                  })
+                  .catch((info) => {
+                    console.log('Validate Failed:', info);
+                  });
+              }} onCancel={handleCancel}>
+                <Form
+                  form={form}
+                  layout="vertical"
+                  name="form_in_modal"
+                  initialValues={{
+                    modifier: 'public',
+                  }}
+                >
+                  <Form.Item
+                    name="radio"
+
+                    rules={[{ required: true, message: 'Please pick an item!' }]}
+                  >
+                    <Radio.Group name="radio-gruop">
+                      <Radio value={1}>人员列</Radio>
+                      <Radio value={2}>普通列</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item
+                    label="title"
+                    name="title"
+                    rules={[{ required: true, message: 'Please input your colname!' }, {
+                      validator: (rule, val, callback) => {
+                        colkey.map(item => {
+                          if (item === val) {
+                            callback('您已经添加过类似的列标题栏，不能输入相同值的列标题')
+                          }
+                        })
+                        callback();
+                      }
+                    }]}
+                  >
+                    <Input />
+                  </Form.Item>
+
+                </Form>
+              </Modal>
+
+              <Button
+                onClick={showModal}
+                type="primary"
+                style={{
+                  marginBottom: 16,
+                }}
+              >
+                <PlusOutlined />增添一列
+              </Button>
+              <Button type="primary" onClick={handleExport}><VerticalAlignBottomOutlined />导出</Button>
+              <Button type="primary" onClick={handleSave}><SaveOutlined />保存为新模板</Button>
+
+
+            </div>
+            <Table className={style.tablestyle} columns={columns} dataSource={[...importExcel]} pagination={false}></Table>
 
           </div>
-
-        </div>
-      </form>
-      <table className={style.tablestyle}>
-        <thead>
-          <tr>
-            {
-              coldata ?
-                (coldata.map((item, index) => {
-                  return <th key={index}>
-                    {item.title}
-                
-                  </th>
-                }))
-                : <th></th>
-            }
-            {<th>编辑</th>}
-          </tr>
-
-        </thead>
-        <tbody>
-          {
-            importExcel ?
-              (importExcel.map((items, row) => {
-                return <tr key={row + items}>
-                  {
-                    Object.keys(items).map((keys, col) => {
-                      return <td key={keys + col}>
-                        {
-                          
-                         
-                         (col === 2 || col === 3) &&( coldata[2].id === 'principal') ?
-
-                            <Select
-                              mode="multiple"
-                              allowClear
-                              style={{ width: '100%' }}
-                              placeholder="Please select"
-                              onChange={handleselectChange}
-                              name={[row, col]}
-                           
-                              // defaultValue={freearr?freearr:""}
-                            >
-                              {userdata.map((item, index) => {
-                                
-                                return <Option name={[row, col]} key={index} >
-                                  {item}
-                                  </Option>
-                              })}
-                            </Select>
-
-                            :
-                            <div className={style.tableinput} name={[row, col]} suppressContentEditableWarning contentEditable="true" onInput={(e) => handletextchange(e)}>
-                              {items[keys]}
-                            </div>
-
-                        }
-
-                      </td>
-                    })
-                  }
-                  {
-                    <td><Popconfirm title="Sure to delete?" onConfirm={(e) => handleDelete(e, row)}>
-                      <a>Delete</a>
-                    </Popconfirm></td>
-                  }
-                </tr>
-
-              }))
-              :
-              <tr><td>空</td></tr>
-          }
-
-        </tbody>
-      </table>
+        }
+        {console.log("coldata", coldata)}
+        {console.log("importExcel", importExcel)}
+      </div>
 
     </div>
   )
