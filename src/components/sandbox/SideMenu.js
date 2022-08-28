@@ -17,7 +17,7 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 const menuList = [
   {
-    key: "/home",
+    key: "/",
     title: "首页",
     icon: <UserOutlined />
   },

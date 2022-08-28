@@ -29,8 +29,9 @@
     .openstyle {
         position: absolute;
         left: 0;
-        top: 20px;
+        top: 75px;
         background-color: #001529;
+        box-shadow: 3px 3px 3px #a09f9f;
         border:none;
     }
     .menustyle{

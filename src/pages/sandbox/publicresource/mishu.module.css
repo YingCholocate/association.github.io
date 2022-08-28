@@ -18,7 +18,7 @@ html body{
   display: inline-block;
   height: auto;
   max-height:65vh;
-  max-width: 70vw;
+  max-width: 90vw;
   margin-top: 8px;
   flex-wrap: wrap;
   overflow: auto;
@@ -38,7 +38,7 @@ html body{
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  max-height: 57px;
+  max-height: 45px;
   overflow: auto;
   /* align-items: center; */
   flex-wrap: wrap;

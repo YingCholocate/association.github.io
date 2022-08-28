@@ -12,6 +12,7 @@ import { Collapse } from 'antd';
 import path from '../../../assets/photologo.png'
 import Qs from 'qs'
 import Departahow from "../../../components/Departahow";
+import { type } from "@testing-library/user-event/dist/type";
 const { Panel } = Collapse;
 
 const { SubMenu } = Menu;
@@ -27,7 +28,7 @@ export default class Home extends React.Component {
         yance: [],
         shuzi: [],
         limitSize: 3,//每一页最多显示的记录数量
-
+        type:''
     };
 
     showModal = () => {
@@ -93,7 +94,40 @@ export default class Home extends React.Component {
             })
             .catch(error => {
                 console.log(error);
+
             });
+    }
+    getdep=(type)=>{
+        if (localStorage.getItem(`type${type}`)) {
+            console.log(type)
+            const arr2 = [];
+            const arr3 = [];
+            const arr4 = [];
+            const arr5 = [];
+
+            let item = JSON.parse(localStorage.getItem(`type${type}`))
+
+            switch (type) {
+                case 2:
+                    arr2.push(item);
+                    break;
+                case 3:
+                    arr3.push(item);
+                    break;
+                case 4:
+                    arr4.push(item);
+                    break;
+                case 5:
+                    arr5.push(item);
+                    break;
+            }
+            this.setState({
+                shuzi: arr2,
+                jishu: arr3,
+                mishu: arr4,
+                yance: arr5
+            })
+        }
     }
     componentDidMount() {
         let article = JSON.parse(localStorage.getItem('article1'))
@@ -101,7 +135,7 @@ export default class Home extends React.Component {
             this.setState({
                 articledata: article[0],
                 limitPage: article[1],//一共分为多少页
-                total:article[2]//总共有多少条数据
+                total: article[2]//总共有多少条数据
             })
         } else {
             // 获取社团资源
@@ -142,12 +176,13 @@ export default class Home extends React.Component {
                 })
             })
             .catch(error => {
-                console.log(error);
+                this.getdep(3)
             });
     }
 
     // 请求公共资源部门数据
     getdepart = (type) => {
+        this.setState({type,type})
         axios.get(`association/resourcedata?type=${type}`)
             .then(res => {
                 const arr2 = [];
@@ -181,7 +216,8 @@ export default class Home extends React.Component {
                 })
             })
             .catch(error => {
-                console.log(error);
+                this.getdep(type)
+               
             });
     }
 
@@ -219,51 +255,51 @@ export default class Home extends React.Component {
         this.getarticleData(e)
     }
     render() {
-        const { visible, loading, total, limitSize } = this.state;
+        const { visible, loading, total, limitSize,type } = this.state;
         return (
             <div className={style.homecontent}>
                 <Divider orientation="left">社团公共资源</Divider>
                 <div className={style.resourcecontent}>
                     <div className={style.leftresource}>
-                    <Layout className="site-layout-background" >
-                        <Sider className="site-layout-background" style={{maxWidth:'200px'}}>
-                            <Menu
-                                mode="inline"
-                                defaultSelectedKeys={['1']}
-                                defaultOpenKeys={['sub1']}
-                                style={{ height: '100%' }}
-                                onClick={this.showdepart}
-                            >
-                                <Menu.Item icon={<UserOutlined />} key="1" >技术部</Menu.Item>
-                                <Menu.Item icon={<LaptopOutlined />} key="2">数资部</Menu.Item>
-                                <Menu.Item icon={<NotificationOutlined />} key="3">秘书处</Menu.Item>
-                                <Menu.Item icon={<UserOutlined />} key="4">研策部</Menu.Item>
+                        <Layout className="site-layout-background" >
+                            <Sider className="site-layout-background" style={{ maxWidth: '200px' }}>
+                                <Menu
+                                    mode="inline"
+                                    defaultSelectedKeys={['1']}
+                                    defaultOpenKeys={['sub1']}
+                                    style={{ height: '100%' }}
+                                    onClick={this.showdepart}
+                                >
+                                    <Menu.Item icon={<UserOutlined />} key="1" >技术部</Menu.Item>
+                                    <Menu.Item icon={<LaptopOutlined />} key="2">数资部</Menu.Item>
+                                    <Menu.Item icon={<NotificationOutlined />} key="3">秘书处</Menu.Item>
+                                    <Menu.Item icon={<UserOutlined />} key="4">研策部</Menu.Item>
 
-                            </Menu>
-                        </Sider>
-                        <Departahow departtitle={this.state.departtitle} departdata={this.state.departdata} visible={visible} />
-                    </Layout>
+                                </Menu>
+                            </Sider>
+                            <Departahow departtitle={this.state.departtitle} departdata={type===2?this.state.shuzi:type===3?this.state.jishu:type===4?this.state.mishu:this.state.yance} visible={visible} />
+                        </Layout>
                     </div>
                 </div>
                 <div className={style.bottomstyle}>
-                <Divider orientation="left">社团推文</Divider>
-                <List
-                    className={style.liststyle}
-                    itemLayout="horizontal"
-                    dataSource={this.state.articledata}
-                    renderItem={item => (
-                        <List.Item>
-                            <List.Item.Meta
-                                avatar={<Avatar href={path} />}
-                                title={<a href={item.link} target="_blank">{item.title}</a>}
-                                description={item.uploadtime}
-                            />
+                    <Divider orientation="left">社团推文</Divider>
+                    <List
+                        className={style.liststyle}
+                        itemLayout="horizontal"
+                        dataSource={this.state.articledata}
+                        renderItem={item => (
+                            <List.Item>
+                                <List.Item.Meta
+                                    avatar={<Avatar href={path} />}
+                                    title={<a href={item.link} target="_blank">{item.title}</a>}
+                                    description={item.uploadtime}
+                                />
 
-                            <Button className={style.buttonstyle} onClick={() => this.handleDelete(item.id)}>delete</Button>
-                        </List.Item>
-                    )}
-                />
-                <Pagination className={style.pagestyle} defaultCurrent={1} total={total} pageSize={limitSize} onChange={this.pageonChange} />
+                                <Button className={style.buttonstyle} onClick={() => this.handleDelete(item.id)}>delete</Button>
+                            </List.Item>
+                        )}
+                    />
+                    <Pagination className={style.pagestyle} defaultCurrent={1} total={total} pageSize={limitSize} onChange={this.pageonChange} />
                 </div>
             </div>
         );

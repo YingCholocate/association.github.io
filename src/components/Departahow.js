@@ -9,8 +9,10 @@ export default function Departahow(props) {
 
         <div className={style.departstyle} >{/* 消息列表 */}
             <Card title={departtitle}>
+                {console.log(departdata)}
                 {departdata&&departdata.length!==0 ?
                     departdata.map(item => {
+                        {console.log(item)}
                         return (
                             <div key={item.id} className={style.departcontent}>
                                 <p key={item.id}><a href={item.link} target="_blank">{item.title}</a></p>

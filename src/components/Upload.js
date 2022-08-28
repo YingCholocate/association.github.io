@@ -30,8 +30,8 @@ const datatype = [
 export default function Upload(props) {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
-  const [checkedvalue,setcheckedvalue]=useState('');
-  const [type,settype]=useState(props.type);
+  const [checkedvalue, setcheckedvalue] = useState('');
+  const [type, settype] = useState(props.type);
   const next = () => {
     setCurrent(current + 1);
   };
@@ -40,38 +40,57 @@ export default function Upload(props) {
     setCurrent(current - 1);
   };
   const onChange = (e) => {
-    setcheckedvalue(()=>e.target.value)
+    setcheckedvalue(() => e.target.value)
     console.log(`radio checked:${e.target.value}`);
-    if(type==='mishu'&&e.target.value==='推文'){
+    if (type === 'mishu' && e.target.value === '推文') {
       settype(1)
-    }else if(type==='mishu'&&e.target.value==='资料文件'){
+    } else if (type === 'mishu' && e.target.value === '资料文件') {
       settype(4)
     }
   }
-  const handleSubmit=(values)=>{
-    const date=new Date();
-    axios('/association/resourcedata',{
-      data:{
-        "link" :values.link,
-        "title":values.title,
-        "uploadtime":(date.getFullYear()+'-'+date.getMonth()+"-"+date.getDate()).toString(),
-        "type":type,
-        "method":"add"
+  const handleSubmit = (values) => {
+    const date = new Date();
+    axios('/association/resourcedata', {
+      data: {
+        "link": values.link,
+        "title": values.title,
+        "uploadtime": (date.getFullYear() + '-' + date.getMonth() + "-" + date.getDate()).toString(),
+        "type": type,
+        "method": "add"
       },
-      method:'POST',
-      headers:{
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
       },
-      transformRequest:[function(data){
+      transformRequest: [function (data) {
         return Qs.stringify(data)
       }]
-        }).then(response=>{
+    }).then(response => {
       message.success('上传成功')
       setTimeout(() => {
-        navigate('/home')
+        navigate('/')
       }, 2000);
-   
-  })
+
+    }).catch(err => {
+      let data = {
+        "link": values.link,
+        "title": values.title,
+        "uploadtime": (date.getFullYear() + '-' + date.getMonth() + "-" + date.getDate()).toString(),
+        "type": type,
+        "id":0,
+        "method": "add"
+      }
+      console.log(data)
+      console.log(type)
+      // localStorage.setItem()
+      localStorage.setItem(`type${type}`, JSON.stringify(data))
+
+
+      message.success('上传成功')
+      setTimeout(() => {
+        navigate('/')
+      }, 2000);
+    })
   }
   return (
     <>
@@ -85,18 +104,18 @@ export default function Upload(props) {
         <div className='contenthore'>
           {current === 0 ?
             (<Radio.Group onChange={onChange}>
-              {(type==="mishu"||type===1||type===4)?
-              datatype.map(item => {
-                return <Radio.Button key={item.content} value={item.content}>{item.content}</Radio.Button>
-              })
-              : <Radio.Button value={datatype[1].content}>{datatype[1].content}</Radio.Button>
+              {(type === "mishu" || type === 1 || type === 4) ?
+                datatype.map(item => {
+                  return <Radio.Button key={item.content} value={item.content}>{item.content}</Radio.Button>
+                })
+                : <Radio.Button value={datatype[1].content}>{datatype[1].content}</Radio.Button>
               }
 
             </Radio.Group>) :
             (current === 1 ?
               (
                 <Form onFinish={handleSubmit}>
-                  <Form.Item label="链接"name="link"rules={[{ required: true, message: 'Please input your link!' }]}>
+                  <Form.Item label="链接" name="link" rules={[{ required: true, message: 'Please input your link!' }]}>
                     <Input placeholder="input 链接" />
                   </Form.Item>
                   <Form.Item label="标题" name="title" rules={[{ required: true, message: 'Please input your title!' }]}>

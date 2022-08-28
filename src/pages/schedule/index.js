@@ -1,6 +1,6 @@
 
 import React, { Fragment, useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Radio, Carousel, message,Select, List, InputNumber,Typography } from 'antd';
+import { Table, Button, Modal, Form, Input, Radio, Carousel, message, Select, List, InputNumber, Typography } from 'antd';
 import printCalendar from "./calendar";
 import { SketchPicker } from 'react-color';
 import axios from "axios";
@@ -117,59 +117,74 @@ const CollectionsPage = () => {
 
     )
     // 每个星期的日期Date形式
-    const [arrd,setarrd]=useState()
+    const [arrd, setarrd] = useState()
     const [fidate, setfidate] = useState([])
     // 设置点击的number
     const [nownumber, setnoenumber] = useState(number)
+    const getdaytime = (arrday) => {
+        console.log("arrday", arrday)
+        // 第一周时间
+        let day = new Date(arrday[0].start)
+
+        setfidate(day)
+        let dayend = new Date(arrday[0].end)
+
+        let oneDayTime = 1000 * 60 * 60 * 24
+        let dayduring = parseInt((dayend.getTime() - day.getTime()) / oneDayTime / 7) + 1;
+
+        let arr = [];
+
+        let days = time.getTime() - day.getTime();
+        let daytime = day.getTime();
+        // 当前第几周
+        let zc = parseInt(days / (oneDayTime) / 7) + 1;
+
+        // 当前星期几
+        let xq = time.getDay();
+        for (let i = 0; i < dayduring; i++) {
+            let week = new Date(daytime);
+            daytime += oneDayTime * 7
+            arr.push(week)
+
+        }
+        setfidate(arr);
+
+        localStorage.setItem("fidate", JSON.stringify(arr));
+        setzc(zc)
+        setxq(xq);
+    }
     useEffect(() => {
         axios.get("/association/startandend?id=1").then(res => {
-            // 第一周时间
-            let day = new Date(res.data[0].start)
-
-            setfidate(day)
-            let dayend = new Date(res.data[0].end)
-
-            let oneDayTime = 1000 * 60 * 60 * 24
-            let dayduring = parseInt((dayend.getTime() - day.getTime()) / oneDayTime / 7) + 1;
-
-            let arr = [];
-            
-            let days = time.getTime() - day.getTime();
-            let daytime = day.getTime();
-            // 当前第几周
-            let zc = parseInt(days / (oneDayTime) / 7) + 1;
-
-            // 当前星期几
-            let xq = time.getDay();
-            for (let i = 0; i < dayduring; i++) {
-                let week = new Date(daytime);
-                daytime += oneDayTime * 7
-                arr.push(week)
-
+            getdaytime(res.data)
+        }).catch(err => {
+            let arr = [{
+                "id": 1,
+                "start": "2022-02-21",
+                "end": "2022-07-10"
             }
-            setfidate(arr);
-            
-            localStorage.setItem("fidate", JSON.stringify(arr));
-            setzc(zc)
-            setxq(xq);
+            ]
+            getdaytime(arr)
+
         })
     }, [])
+
+
 
     useEffect(() => {
         let oneDayTime = 1000 * 60 * 60 * 24
         let newtime = new Date(fidate[zc - 1])
-        let arrdate=[];
+        let arrdate = [];
         if (fidate[zc - 1]) {
             let weekstartTime = newtime.getTime();
             let weekdate = [];
-            
+
             for (let i = 0; i < 7; i++) {
                 let week = new Date(weekstartTime);
                 weekstartTime += oneDayTime
                 let weekstr = week.getDate()
                 weekdate.push(weekstr)
                 arrdate.push(week)
-           
+
             }
             setarrd([...arrdate]);
             setmonth(newtime.getMonth() + 1)
@@ -353,12 +368,12 @@ const CollectionsPage = () => {
                             {jcdmchildren}
                         </Select>
                     </Form.Item>
-                  
+
                     <Form.Item name="jxcdmc" label="上课地点(可选)">
                         <Input type="textarea" />
                     </Form.Item>
-                    <Form.Item name="colorchan" label="课程背景颜色">
-                        <Input type='color' value='#1890ff'/>
+                    <Form.Item name="bgcolor" label="课程背景颜色">
+                        <Input type='color' value='#1890ff' />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -377,6 +392,31 @@ const CollectionsPage = () => {
     // })
     const [sumall, setsumall] = useState([]);
     const [timedate, settimedate] = useState('');
+    const getonecourse = (carr) => {
+        console.log(carr)
+        setsumall(carr)
+        let coursed = carr.filter((item, index) => {
+            if (item) {
+                let zcarr = carr[index].cd[0]['zc'].split(',')
+                return (zc >= zcarr[0]) && (zc <= zcarr[1])
+            }
+
+        }
+
+        )
+        let newcoursed = []
+        let knotarr = []
+        coursed.map(item => {
+            newcoursed.push(item.cd[0]);
+            knotarr.push(item.cd[0]['jcdm2']);
+        })
+        let time = localStorage.getItem('time');
+        let timedate = new Date(time);
+        settimedate(timedate)
+        console.log(newcoursed)
+        setcource([...newcoursed])
+        setknot([...knotarr])
+    }
     const getCourse = (number) => {
         axios.get(`association/course?method=getone`, {
             params: {
@@ -384,28 +424,54 @@ const CollectionsPage = () => {
             }
         })
             .then(res => {
-                setsumall(res.data)
-                let coursed = res.data.filter((item, index) => {
-                    if (item) {
-                        let zcarr = res.data[index].cd[0]['zc'].split(',')
-                        return (zc >= zcarr[0]) && (zc <= zcarr[1])
+                getonecourse(res.data)
+            }).catch(err => {
+                console.log("number", number)
+                if (number === '32156789' || number === '35456') {
+                    if (localStorage.getItem('courcearr1')) {
+                        let ccc=JSON.parse(localStorage.getItem('courcearr1'))
+                        getonecourse(ccc)
+                    }else{
+                        let courcearr = [
+                            {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '7,8', kcmc: 8, jcdm: '0304', jcdm2: '03,04', kcmc: 8, xq: 1, courseid: 1, cou: [{ bgcolor: '#FF6699', cid: 0, cname: '形势与政策', courseid: 1 }] }]
+                            },
+                            {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '11,14', kcmc: 7, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#CC0066', cid: 0, cname: '大学生就业创业指导', courseid: 1 }] }]
+                            },
+                            {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 1, jcdm: '0304', jcdm2: '06,07', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: 'pink', cid: 0, cname: '大数据存储及应用', courseid: 1 }] }]
+                            }, {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 4, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 3, courseid: 1, cou: [{ bgcolor: '#FF0099', cid: 0, cname: '大数据可视化', courseid: 1 }] }]
+                            }, {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,16', kcmc: 2, jcdm: '0304', jcdm2: '01,02', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'yellow', cid: 0, cname: '互联网金融大数据分析', courseid: 1 }] }]
+                            }, {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '4,19', kcmc: 6, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'orange', cid: 0, cname: '决策理论与方法', courseid: 1 }] }]
+                            }, {
+                                id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 3, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 5, courseid: 1, cou: [{ bgcolor: '#FF3333', cid: 0, cname: '人工智能基础', courseid: 1 }] }]
+                            }]
+                          
+                        localStorage.setItem('courcearr1', JSON.stringify(courcearr))
+                        getonecourse(courcearr)
                     }
+                   
 
                 }
+                else {
+                    if (localStorage.getItem('courcearr2')) {
+                        let ccc=JSON.parse(localStorage.getItem('courcearr2'))
+                        getonecourse(ccc)
+                    }else{
+                    const courcearr = [{
+                        id: 0, stuid: '67890', courseid: 3, cd: [{ id: 0, zc: '1,10', kcmc: 15, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#A52A2A', cid: 0, cname: '数学建模', courseid: 3 }] }]
+                    }, {
+                        id: 0, stuid: '67890', courseid: 3, cd: [{ id: 0, zc: '1,9', kcmc: 16, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#DC143C', cid: 0, cname: '网络安全技术', courseid: 3 }] }]
+                    }]
+                    localStorage.setItem('courcearr2', JSON.stringify(courcearr))
+                    getonecourse(courcearr)
+                }
+            }
 
-                )
-                let newcoursed = []
-                let knotarr = []
-                coursed.map(item => {
-                    newcoursed.push(item.cd[0]);
-                    knotarr.push(item.cd[0]['jcdm2']);
-                })
-                let time = localStorage.getItem('time');
-                let timedate = new Date(time);
-                settimedate(timedate)
-                // console.log(newcoursed)
-                setcource([...newcoursed])
-                setknot([...knotarr])
             })
     }
     // 定义点击的效果切换
@@ -435,25 +501,29 @@ const CollectionsPage = () => {
         let charsnew = [];
         let displaydata = [...initialData]
         const arr = []
-        cource.map((item, index) => {
-            courceidx.push(item['jcdm2'])
-            xq.push(item['xq'])
-            const chars = item['jcdm2'].split(',')
-            chars[0] = parseInt(chars[0])
-            chars[1] = parseInt(chars[1])
-            charsnew.push(chars)
-            initialData.map((it, ii) => {
-                if ((ii == chars[0] - 1) || (ii == chars[1] - 1)) {
-                    displaydata[ii] = {
-                        ...displaydata[ii],
-                        ["C" + item['xq']]: [item.cou[0].cname, item.cou[0].bgcolor],
+        console.log(cource)
+        if (cource) {
+            cource.map((item, index) => {
+                courceidx.push(item['jcdm2'])
+                xq.push(item['xq'])
+                const chars = item['jcdm2'].split(',')
+                chars[0] = parseInt(chars[0])
+                chars[1] = parseInt(chars[1])
+                charsnew.push(chars)
+                initialData.map((it, ii) => {
+                    if ((ii == chars[0] - 1) || (ii == chars[1] - 1)) {
+                        displaydata[ii] = {
+                            ...displaydata[ii],
+                            ["C" + item['xq']]: [item.cou[0].cname, item.cou[0].bgcolor],
 
+                        }
+                    } else {
+                        displaydata[ii] = { ...displaydata[ii] }
                     }
-                } else {
-                    displaydata[ii] = { ...displaydata[ii] }
-                }
+                })
             })
-        })
+        }
+
 
         setdata([...displaydata])
 
@@ -463,54 +533,49 @@ const CollectionsPage = () => {
     const onCreate = (values) => {
         console.log('Received values of form: ', values);
         let arr = []
-        console.log(parseInt(values.jcdm2)+1)
-        axios('/association/course',{
-            data:{
-              ...values,
-              "zc":values.zcstart+','+values.zcend,
-              "jcdm2":values.jcdm2+','+(parseInt(values.jcdm2)+1),
-              "index":number
+        console.log(parseInt(values.jcdm2) + 1)
+        axios('/association/course', {
+            data: {
+                ...values,
+                "zc": values.zcstart + ',' + values.zcend,
+                "jcdm2": values.jcdm2 + ',' + (parseInt(values.jcdm2) + 1),
+                "index": number
             },
-            method:'POST',
-            headers:{
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
-            transformRequest:[function(data){
-              return Qs.stringify(data)
+            transformRequest: [function (data) {
+                return Qs.stringify(data)
             }]
-              }).then(response=>{
+        }).then(response => {
             message.success('上传成功')
-            setTimeout(() => {
-             
-            }, 2000);
-         
+
+        }).catch(err => {
+            let data = {
+                id: 0, zc: values.zcstart + ',' + values.zcend, kcmc: 8, jcdm: '0304', jcdm2: values.jcdm2 + ',' + (parseInt(values.jcdm2) + 1), kcmc: 8, xq: 1, courseid: 1, cou: [{ bgcolor: values.bgcolor, cid: 0, cname: values.kcmc, courseid: 1 }]
+
+            }
+            console.log(data)
+            console.log([...cource, data])
+            let temparr=[...cource, data]
+            // localStorage.setItem('courcearr1',JSON.parse(temparr))
+            setcource([...cource, data])
+            message.success('上传成功')
         })
 
-        // values.zc.map(item => {
-        //     values = {
-        //         ...values,
-        //         zc: item,
-        //     }
-        //     arr.push(values)
-        // })
-        // let newsumall = [...sumall]
-        // arr.map(item => {
-        //     newsumall.push(item)
-        // })
-        // console.log([...newsumall])
-        // axios.put(`http://localhost:5000/course/1`, {
-        //     ['coursealldata']: [...newsumall]
-        // }).then(res => {
-        //     console.log(values.zc)
-        //     setcource([...newsumall])
-
-        // }
-
-        // )
         setVisible(false);
     };
 
-    const userdata = JSON.parse(localStorage.getItem('alluser'))
+    let userdata = JSON.parse(localStorage.getItem('alluser'))
+    if(!userdata){
+       userdata=[["admin数资部工作人员", "32156789"],
+         ["people数资部工作人员", "35456"]
+       , ["b技术部工作人员", "66667"]
+        ,["a秘书处工作人员", "67890"]
+        , ["d主席", "6888"]
+       ,["c研策部工作人员", "896667"]]
+    }
     const seecourse = (e, value, id) => {
         console.log(id)
         console.log(value)
@@ -571,24 +636,25 @@ const CollectionsPage = () => {
                         {
 
                             data.map(function (item, index) {
-
+                                // console.log(data)
                                 return (
 
                                     <tr key={index} className={style.tdtext}>
                                         <th scope="row">{item.key}</th>
 
-                                        {item.C1 ?(arrd&&arrd[0]&&arrd[0]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C1[0]}</td>:<td style={{ backgroundColor: item.C1[1] }}>{item.C1[0]}</td>) : <td >{item.C1}</td>}
-                                        {item.C2 ?(arrd&&arrd[1]&&arrd[1]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C2[0]}</td>: <td style={{ backgroundColor: item.C2[1] }}>{item.C2[0]}</td> ): <td>{item.C2}</td>}
-                                        {item.C3 ? (arrd&&arrd[2]&&arrd[2]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C3[0]}</td>:<td style={{ backgroundColor: item.C3[1] }}>{item.C3[0]}</td>) : <td>{item.C3}</td>}
-                                        {item.C4 ?(arrd&&arrd[3]&&arrd[3]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C4[0]}</td>: <td style={{ backgroundColor: item.C4[1] }}>{item.C4[0]}</td>) : <td>{item.C4}</td>}
-                                        {item.C5 ? (arrd&&arrd[4]&&arrd[4]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C5[0]}</td>:<td style={{ backgroundColor: item.C5[1] }}>{item.C5[0]}</td>) : <td>{item.C5}</td>}
-                                        {item.C6 ?(arrd&&arrd[5]&&arrd[5]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C6[0]}</td>: <td style={{ backgroundColor: item.C6[1] }}>{item.C6[0]}</td>) : <td>{item.C6}</td>}
-                                        {item.C7 ? (arrd&&arrd[6]&&arrd[6]<time? <td style={{ backgroundColor: "lightgray" }}>{item.C7[0]}</td>:<td style={{ backgroundColor: item.C7[1] }}>{item.C7[0]}</td>) : <td>{item.C7}</td>}
+                                        {item.C1 ? (arrd && arrd[0] && arrd[0] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C1[0]}</td> : <td style={{ backgroundColor: item.C1[1] }}>{item.C1[0]}</td>) : <td >{item.C1}</td>}
+                                        {item.C2 ? (arrd && arrd[1] && arrd[1] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C2[0]}</td> : <td style={{ backgroundColor: item.C2[1] }}>{item.C2[0]}</td>) : <td>{item.C2}</td>}
+                                        {item.C3 ? (arrd && arrd[2] && arrd[2] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C3[0]}</td> : <td style={{ backgroundColor: item.C3[1] }}>{item.C3[0]}</td>) : <td>{item.C3}</td>}
+                                        {item.C4 ? (arrd && arrd[3] && arrd[3] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C4[0]}</td> : <td style={{ backgroundColor: item.C4[1] }}>{item.C4[0]}</td>) : <td>{item.C4}</td>}
+                                        {item.C5 ? (arrd && arrd[4] && arrd[4] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C5[0]}</td> : <td style={{ backgroundColor: item.C5[1] }}>{item.C5[0]}</td>) : <td>{item.C5}</td>}
+                                        {item.C6 ? (arrd && arrd[5] && arrd[5] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C6[0]}</td> : <td style={{ backgroundColor: item.C6[1] }}>{item.C6[0]}</td>) : <td>{item.C6}</td>}
+                                        {item.C7 ? (arrd && arrd[6] && arrd[6] < time ? <td style={{ backgroundColor: "lightgray" }}>{item.C7[0]}</td> : <td style={{ backgroundColor: item.C7[1] }}>{item.C7[0]}</td>) : <td>{item.C7}</td>}
                                     </tr>
 
                                 )
 
                             })
+                            // :
                         }
                     </tbody>
 
@@ -609,15 +675,16 @@ const CollectionsPage = () => {
                 </div>
             </div>
 
-
-            <Button
-                type="primary"
-                onClick={() => {
-                    setVisible(true);
-                }}
-            >
-                添加课程
-            </Button>
+            {nownumber === '32156789' ?
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        setVisible(true);
+                    }}
+                >
+                    添加课程
+                </Button> : ''
+            }
             <CollectionCreateForm
                 visible={visible}
                 onCreate={onCreate}

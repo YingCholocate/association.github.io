@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import * as XLSX from 'xlsx'
-import { Button, Popconfirm, Modal, Radio, Tag, Table, Switch, Select, Popover, Dropdown, Input, Form, DatePicker, Space, Menu, message, Upload } from 'antd';
+import { Button, Popconfirm, Modal, Radio, Tag, Table, Switch, Select, Popover, Dropdown, Input, Form, DatePicker, Space, Menu, message, Upload, Tooltip } from 'antd';
 import style from './mishu.module.css'
 import axios from 'axios';
 import { PlusOutlined, SwapOutlined, VerticalAlignBottomOutlined, SaveOutlined, EditOutlined, FileExcelOutlined } from '@ant-design/icons';
@@ -115,11 +115,21 @@ export default function Mishu() {
         // console.log(userotherdata)
         localStorage.setItem('alluser', JSON.stringify(userotherdata))
       }
-      )
+      ).catch(err => {
+        let userother = [["admin数资部工作人员", "32156789"],
+        ["people数资部工作人员", "35456"]
+          , ["b技术部工作人员", "66667"]
+          , ["a秘书处工作人员", "67890"]
+          , ["d主席", "6888"]
+          , ["c研策部工作人员", "896667"]]
+
+        localStorage.setItem('alluser', JSON.stringify(userother))
+      })
     return userotherdata
   }
 
   )
+  console.log("userdata", userdata)
   // 添加部门
   const adddepartment = (item, colorarr) => {
 
@@ -145,17 +155,35 @@ export default function Mishu() {
   useEffect(() => {
     axios.get('/association/users?method=getall')
       .then(res => {
+        console.log(res.data)
         let userotherdata = [];
         let colorarr = [];
         res.data.map(item => {
           adddepartment(item, colorarr)
-
           userotherdata = [...userotherdata, (item.username + item.role[0]['rolevalue'])]//Todo
         })
+        console.log(",,,", userotherdata)
         setuserdata([...userotherdata])
       }
 
-      )
+      ).catch(err => {
+        let colorarr = [];
+        let userarr = [];
+        let userotherdata = [
+          { department: 2, username: 'admin', password: '234567', number: '32156789', role: [{ id: 0, rolevalue: '数资部工作人员' }] },
+          { department: 2, username: 'people', password: '345', number: '35456', role: [{ id: 0, rolevalue: '数资部工作人员' }] },
+          { department: 4, username: 'b', password: '464', number: '66667', role: [{ id: 0, rolevalue: '技术部工作人员' }] },
+          { department: 3, username: 'a', password: '3456', number: '67890', role: [{ id: 0, rolevalue: '秘书处工作人员' }] },
+          { department: 6, username: 'd', password: '64', number: '6888', role: [{ id: 0, rolevalue: '主席' }] },
+          { department: 5, username: 'c', password: '46', number: '896667', role: [{ id: 0, rolevalue: '研策部工作人员' }] }]
+        // ['admin数资部工作人员', 'people数资部工作人员', 'b技术部工作人员', 'a秘书处工作人员', 'd主席', 'c研策部工作人员']
+        userotherdata.map(item => {
+          adddepartment(item, colorarr)
+          userarr = [...userarr, (item.username + item.role[0]['rolevalue'])]
+        })
+        console.log(userarr)
+        setuserdata([...userarr])
+      })
   }, [])
   // 设置文件名
   const [filename, setfilename] = useState("")
@@ -206,6 +234,7 @@ export default function Mishu() {
   // 获取工作成员的课表得到某时刻无法工作的人员
   useEffect(() => {
     axios.get(`/association/course?method=getall`).then(res => {
+      console.log(res.data)
       let zc = 1;
       if (time) {
         let timedate = new Date(time);
@@ -252,6 +281,7 @@ export default function Mishu() {
           }).then(res => {
             zcarr[i] = [zcarr[i], res.data.username + res.data.role[0].rolevalue]
             let username = res.data.username + res.data.role[0].rolevalue;
+            console.log(res.data)
             if (res.data.department != 1) {
               // 將其放入对应的时间节次
               let jc = [1, 3, 6, 8]
@@ -287,6 +317,127 @@ export default function Mishu() {
             setperson([...personarr]);
           }
           )
+        }
+      }
+    }).catch(err => {
+      let zc = 1;
+      if (time) {
+        let timedate = new Date(time);
+
+        let oneDayTime = 1000 * 60 * 60 * 24
+        let fidate = JSON.parse(localStorage.getItem('fidate'));
+        let xq = timedate.getDay();
+        let firsttimedate = timedate.getTime() - oneDayTime * (xq - 1);
+        let newtimedate = new Date(firsttimedate);
+        fidate.map((item, i) => {
+          let first = new Date(item);
+          if (first.toDateString() === newtimedate.toDateString()) {
+            zc = i + 1;
+          }
+        })
+
+        let zcarr = [];
+        let arr = [];
+        let courcearr1 = [
+          {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '7,8', kcmc: 8, jcdm: '0304', jcdm2: '03,04', kcmc: 8, xq: 1, courseid: 1, cou: [{ bgcolor: '#FF6699', cid: 0, cname: '形势与政策', courseid: 1 }] }]
+          },
+          {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '11,14', kcmc: 7, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#CC0066', cid: 0, cname: '大学生就业创业指导', courseid: 1 }] }]
+          },
+          {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 1, jcdm: '0304', jcdm2: '06,07', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: 'pink', cid: 0, cname: '大数据存储及应用', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 4, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 3, courseid: 1, cou: [{ bgcolor: '#FF0099', cid: 0, cname: '大数据可视化', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,16', kcmc: 2, jcdm: '0304', jcdm2: '01,02', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'yellow', cid: 0, cname: '互联网金融大数据分析', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '4,19', kcmc: 6, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'orange', cid: 0, cname: '决策理论与方法', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '32156789', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 3, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 5, courseid: 1, cou: [{ bgcolor: '#FF3333', cid: 0, cname: '人工智能基础', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '7,8', kcmc: 8, jcdm: '0304', jcdm2: '03,04', kcmc: 8, xq: 1, courseid: 1, cou: [{ bgcolor: '#FF6699', cid: 0, cname: '形势与政策', courseid: 1 }] }]
+          },
+          {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '11,14', kcmc: 7, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#CC0066', cid: 0, cname: '大学生就业创业指导', courseid: 1 }] }]
+          },
+          {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 1, jcdm: '0304', jcdm2: '06,07', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: 'pink', cid: 0, cname: '大数据存储及应用', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 4, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 3, courseid: 1, cou: [{ bgcolor: '#FF0099', cid: 0, cname: '大数据可视化', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '1,16', kcmc: 2, jcdm: '0304', jcdm2: '01,02', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'yellow', cid: 0, cname: '互联网金融大数据分析', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '4,19', kcmc: 6, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 4, courseid: 1, cou: [{ bgcolor: 'orange', cid: 0, cname: '决策理论与方法', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '35456', courseid: 1, cd: [{ id: 0, zc: '1,12', kcmc: 3, jcdm: '0304', jcdm2: '03,04', jxcdmc: '教109', xq: 5, courseid: 1, cou: [{ bgcolor: '#FF3333', cid: 0, cname: '人工智能基础', courseid: 1 }] }]
+          }, {
+            id: 0, stuid: '67890', courseid: 3, cd: [{ id: 0, zc: '1,10', kcmc: 15, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#A52A2A', cid: 0, cname: '数学建模', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '67890', courseid: 3, cd: [{ id: 0, zc: '1,9', kcmc: 16, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#DC143C', cid: 0, cname: '网络安全技术', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '6667', courseid: 3, cd: [{ id: 0, zc: '1,10', kcmc: 15, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#A52A2A', cid: 0, cname: '数学建模', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '6667', courseid: 3, cd: [{ id: 0, zc: '1,9', kcmc: 16, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#DC143C', cid: 0, cname: '网络安全技术', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '6888', courseid: 3, cd: [{ id: 0, zc: '1,10', kcmc: 15, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#A52A2A', cid: 0, cname: '数学建模', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '6888', courseid: 3, cd: [{ id: 0, zc: '1,9', kcmc: 16, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#DC143C', cid: 0, cname: '网络安全技术', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '896667', courseid: 3, cd: [{ id: 0, zc: '1,10', kcmc: 15, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#A52A2A', cid: 0, cname: '数学建模', courseid: 3 }] }]
+          }, {
+            id: 0, stuid: '896667', courseid: 3, cd: [{ id: 0, zc: '1,9', kcmc: 16, jcdm: '0304', jcdm2: '10,11,12', jxcdmc: '教109', xq: 1, courseid: 1, cou: [{ bgcolor: '#DC143C', cid: 0, cname: '网络安全技术', courseid: 3 }] }]
+          }
+        ]
+        console.log(courcearr1)
+        courcearr1.map((item, index) => {
+          let zcstart = item.cd[0].zc.split(',')
+          console.log("zc", zc)
+          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq == xq)) {
+            zcarr.push(item)
+            arr.push(item.stuid)
+          }
+        })
+
+        // 符合周次和星期的课表详情
+        console.log("zvarr", zcarr)
+        // 创建二维数组存储有课的工作人员
+        console.log(",,,", [...userdata])
+        let personarr = Array.from(Array(tanweidata.length), () => new Array(...userdata))
+        for (let i = 0; i < zcarr.length; i++) {
+          let jc = [1, 3, 6, 8]
+          let username = ""
+          userdata.map(item => {
+            if (item.number === zcarr[i].stuid) {
+              username = item.username;
+            }
+          })
+          jc.map((j, index) => {
+            if (zcarr[i].cd[0].jcdm2) {
+              let a = zcarr[i].cd[0].jcdm2.split(',');
+              if (parseInt(a[0]) === j) {
+                if (j === 1) {
+                  const idx = personarr[0].findIndex(item => item === username)
+                  personarr[0].splice(idx, 1)
+                }
+                if (j === 3) {
+                  const idx = personarr[1].findIndex(item => item === username)
+                  personarr[1].splice(idx, 1)
+                }
+                if (j === 6) {
+                  const idx = personarr[3].findIndex(item => item === username)
+                  personarr[3].splice(idx, 1)
+                }
+                if (j === 8) {
+                  const idx = personarr[4].findIndex(item => item === username)
+                  personarr[4].splice(idx, 1)
+                }
+
+              }
+            }
+          })
+
+          setperson([...personarr]);
         }
       }
     })
@@ -341,7 +492,6 @@ export default function Mishu() {
     console.log(attrarr)
     let rowindex = attrarr[0];
     let colindex = attrarr[1];
-    // if (title === '普通活动人员安排') {
     let tempdata = [...importExcel]
     tempdata.map((item, index) => {
       if (rowindex == index) {
@@ -350,32 +500,6 @@ export default function Mishu() {
     })
     console.log(e)
     let str = e.target.innerHTML.toString()
-    //  else{
-    // e.target.innerHTML=`<p>${e.target.innerText}</p>`
-    // }
-    // if (str.indexOf('div') !== -1) {
-    //   setimportExcel([...tempdata])
-    // }
-
-
-
-    // } else {
-    //   let dataarr = Object.keys(tanwetempdata[rowindex]);
-
-    //   tanwetempdata.map((item, index) => {
-    //     // console.log(rowindex, index, item.key)
-    //     // console.log(rowindex == index && item.key == index)
-    //     if (rowindex == index && item.key == index) {
-    //       item = item[dataarr[colindex]] = e.target.innerText
-    //     }
-
-    //   })
-    //   console.log("tanwetempdata", tanwetempdata)
-    // setimportExcel([...tanwetempdata])
-
-    // }
-
-
   }
 
   // 导出数据
@@ -593,6 +717,8 @@ export default function Mishu() {
       localStorage.setItem('tanweidata', JSON.stringify([...importExcel]))
       localStorage.setItem('tanweicoldata', JSON.stringify([...coldata]))
     }
+    message.success('保存成功,可进行编辑')
+    setEditable(true)
 
 
   }
@@ -755,10 +881,13 @@ export default function Mishu() {
 
           <Form onFinish={tableonFinish}>
             <div className={style.topstyle}>
+
               <Dropdown overlay={menu} placement="bottomLeft" arrow>
-                <Button type="primary" ><SwapOutlined />切换模板</Button>
+                <Tooltip title="切换模板将导致当前编辑内容丢失，确保已编辑完毕和导出数据">
+                  <Button type="primary" ><SwapOutlined />切换模板</Button>
+                </Tooltip>
               </Dropdown>
-              <Button  type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit">
                 <FileExcelOutlined /> 查看效果
               </Button>
 
