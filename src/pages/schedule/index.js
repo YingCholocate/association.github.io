@@ -108,7 +108,7 @@ const CollectionsPage = () => {
     const [firstdate, setfirstdate] = useState(() => {
         let fi = [];
         axios.get(`/association/startandend?id=1`).then(res => {
-            // console.log("fi",res.data[0].start)
+            console.log("fi",res.data[0].start)
             // 第一周时间
             fi = res.data[0].start
         })
@@ -137,7 +137,8 @@ const CollectionsPage = () => {
         let days = time.getTime() - day.getTime();
         let daytime = day.getTime();
         // 当前第几周
-        let zc = parseInt(days / (oneDayTime) / 7) + 1;
+        let zc = (parseInt(days / (oneDayTime) / 7) + 1)%20;
+
 
         // 当前星期几
         let xq = time.getDay();
@@ -187,6 +188,7 @@ const CollectionsPage = () => {
 
             }
             setarrd([...arrdate]);
+            console.log('...',newtime.getMonth() + 1)
             setmonth(newtime.getMonth() + 1)
             // 当前周星期一
             setfirstdate([...weekdate]);

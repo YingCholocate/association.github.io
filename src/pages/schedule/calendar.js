@@ -1,11 +1,7 @@
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 const Double_Weekdays = WEEKDAYS.concat(WEEKDAYS);
 
-function getWeekdays(firstWeekDay = 0) {
-  if (firstWeekDay === 0) return WEEKDAYS;
-  return Double_Weekdays.slice(firstWeekDay, firstWeekDay + 7);
 
-}
 const zh = {
   // 完整名称 
   weekdays: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
@@ -67,12 +63,17 @@ function getMonthCalendar(year, month, options) {
 
 
 }
+function getWeeksDays(firstWeekDay = 0) {
+  if (firstWeekDay === 0) return WEEKDAYS;
+  return Double_Weekdays.slice(firstWeekDay, firstWeekDay + 7);
+
+}
 function format(d) {
   return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, 0)}-${d.getDate().toString().padStart(2, 0)}`
 }
 
 function printCalendar(year, month, firstWeekday) {
-  const weekdays = getWeekdays(firstWeekday)
+  const weekdays = getWeeksDays(firstWeekday)
   const calendar = getMonthCalendar(year, month, { weekdays })
   const columns = getWeekHead(weekdays, en).map((w) => w.abbr)
 

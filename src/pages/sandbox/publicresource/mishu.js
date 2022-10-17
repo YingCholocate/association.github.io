@@ -136,11 +136,11 @@ export default function Mishu() {
     let rolename = item.role[0]['rolevalue']
     if (rolename == '数资部工作人员') {
       colorarr.push('blue')
-    } else if (rolename == '技术部工作人员') {
+    } else if (rolename === '技术部工作人员') {
       colorarr.push('green')
-    } else if (rolename == '秘书处工作人员') {
+    } else if (rolename === '秘书处工作人员') {
       colorarr.push('pink')
-    } else if (rolename == '研策部工作人员') {
+    } else if (rolename === '研策部工作人员') {
       colorarr.push('purple')
     } else {
       colorarr.push('gold')
@@ -256,7 +256,7 @@ export default function Mishu() {
         let arr = [];//ToDO
         res.data.map((item, index) => {
           let zcstart = item.cd[0].zc.split(',')
-          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq == xq)) {
+          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq === xq)) {
             zcarr.push(item)
             arr.push(item.stuid)
           }
@@ -393,7 +393,7 @@ export default function Mishu() {
         courcearr1.map((item, index) => {
           let zcstart = item.cd[0].zc.split(',')
           console.log("zc", zc)
-          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq == xq)) {
+          if ((zc >= zcstart[0] && zc <= zcstart[1]) && (item.cd[0].xq === xq)) {
             zcarr.push(item)
             arr.push(item.stuid)
           }
