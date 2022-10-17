@@ -1,0 +1,20 @@
+.container{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.registerformbtn{
+     width: 100%;
+}
+.formcontainer{
+    border: 1px solid rgb(221, 216, 216);
+    margin:10px;
+    padding: 30px;
+    width:400px;
+}
+.tologin{
+    float:right;
+}

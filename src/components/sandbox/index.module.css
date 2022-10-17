@@ -1,0 +1,52 @@
+.logo {
+    line-height: 50px;
+    color: white;
+    background-color: rgba(231, 219, 219, 0.118);
+    margin: 10px;
+    text-align: center;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.logo img {
+    width: 45px;
+    margin-right: 5px;
+}
+
+#root, .layoutbody {
+    height: 100%;
+}
+
+.sider {
+    display: none;
+    width: 0px;
+    overflow: hidden;
+}
+
+
+
+@media (max-width: 700px) {
+    .openstyle {
+        position: absolute;
+        left: 0;
+        top: 75px;
+        background-color: #001529;
+        box-shadow: 3px 3px 3px #a09f9f;
+        border:none;
+    }
+    .menustyle{
+        display: none;
+    }
+}
+@media (min-width: 700px) {
+    .openstyle {
+        display: none;
+    }
+    
+}
+.openstyle:hover{
+    background-color: #001529;
+}
+.banvisible{
+    display: none;
+}

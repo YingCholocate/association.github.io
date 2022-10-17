@@ -1,0 +1,53 @@
+.resourcecontent {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    flex: 1;
+    height: 225px;
+    overflow: auto;
+}
+
+.liststyle {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex: 1;
+    
+}
+.leftresource{
+    flex:1;
+}
+.buttonstyle {
+    margin-right: 10px;
+}
+
+.pagestyle {
+    float: right;
+}
+
+.departcontent {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.timestyle {
+    color: gray;
+    font-size: 14px;
+}
+
+.departstyle {
+    background-color: white;
+    min-width: 200px;
+    flex: 1;
+    height: 225px;
+    overflow: auto;
+}
+.bottomstyle{
+    height:320px;
+    overflow: auto;
+}
+.homecontent{
+    min-height: 100%;
+}

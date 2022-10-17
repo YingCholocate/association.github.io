@@ -1,0 +1,20 @@
+.active{
+    display: none;
+}
+.contentStyles .contenttitle{
+    margin:10px;
+}
+.steps-action button{
+    float: right;
+}
+.stepsAction,.contenttitle{
+    margin:10px;
+}
+.stepsAction button{
+    float: right;
+}
+.submitstyle{
+    float: left;
+    position:relative;
+    top:52px;
+}
