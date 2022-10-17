@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/association.github.io/static/css/main.e65ee9e4.css",
+    "main.js": "/association.github.io/static/js/main.08952683.js",
+    "static/media/photologo.png": "/association.github.io/static/media/photologo.f7fe9ffa7e57282f4d16.png",
+    "index.html": "/association.github.io/index.html",
+    "main.e65ee9e4.css.map": "/association.github.io/static/css/main.e65ee9e4.css.map",
+    "main.08952683.js.map": "/association.github.io/static/js/main.08952683.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e65ee9e4.css",
+    "static/js/main.08952683.js"
+  ]
+}
