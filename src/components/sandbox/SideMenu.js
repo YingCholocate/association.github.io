@@ -17,7 +17,7 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 const menuList = [
   {
-    key: "/",
+    key: "/association.github.io",
     title: "首页",
     icon: <UserOutlined />
   },

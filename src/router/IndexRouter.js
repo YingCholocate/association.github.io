@@ -18,7 +18,7 @@ export default function IndexRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<NewSandBox />} >
-                    <Route path="/" element={<Home />}>
+                    <Route path="/association.github.io" element={<Home />}>
                     </Route>
                     <Route path="/schedule" element={<Schedule />}></Route>
 
