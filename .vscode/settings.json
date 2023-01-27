@@ -1,0 +1,7 @@
+{
+  "typescript.tsserver.pluginPaths": [
+    "typescript-plugin-css-modules"
+  ],
+  "prettier.configPath": ".prettierrc.js",
+  "eslint.nodeEnv": "development",
+}

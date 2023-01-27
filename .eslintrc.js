@@ -3,12 +3,12 @@ module.exports = {
   globals: {
     page: true,
   },
-  plugins: ['prettier'],
+  plugins: ['prettier', '@typescript-eslint'],
   rules: {
     'import/no-cycle': 'off',
     'react/prop-types': 0,
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
     'prettier/prettier': 'error',
+    semi: 'error',
   },
 };

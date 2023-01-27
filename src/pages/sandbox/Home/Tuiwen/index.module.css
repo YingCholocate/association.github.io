@@ -1,0 +1,20 @@
+.bottomstyle {
+    height: 320px;
+    overflow: auto;
+}
+
+.liststyle {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex: 1;
+
+}
+
+.buttonstyle {
+    margin-right: 10px;
+}
+
+.pagestyle {
+    float: right;
+}

@@ -1,0 +1,13 @@
+.resourcecontent {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    flex: 1;
+    height: 225px;
+    overflow: auto;
+}
+
+.leftresource {
+    flex: 1;
+}
