@@ -12,7 +12,6 @@ const mocks = [
   ...getAuth,
   ...registerUser,
   ...deleteUser,
-
   ...resourcedata,
   ...getAllCourse,
   ...addCourse,
@@ -23,7 +22,7 @@ const mocks = [
 
 function mockXHR() {
   Mock.XHR.prototype.proxy_send = Mock.XHR.prototype.send;
-
+  console.log(Mock.XHR);
   Mock.XHR.prototype.send = function () {
     if (this.custom.xhr) {
       this.custom.xhr.withCredentials = this.withCredentials || false;

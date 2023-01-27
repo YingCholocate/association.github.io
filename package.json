@@ -55,6 +55,7 @@
       "react-app/jest"
     ]
   },
+  "module": "CommonJS",
   "browserslist": {
     "production": [
       ">0.2%",

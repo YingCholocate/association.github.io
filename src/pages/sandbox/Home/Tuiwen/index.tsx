@@ -77,7 +77,7 @@ export default function Tuiwen() {
                 avatar={<Avatar src={path} />}
                 title={
                   <a href={item.link} target="_blank" rel="noreferrer">
-                    {item.title.toString()}
+                    {item.title}
                   </a>
                 }
                 description={item.uploadtime}

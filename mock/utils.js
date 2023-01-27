@@ -19,4 +19,4 @@ const param2Obj = function (url) {
   });
   return obj;
 };
-module.exports = param2Obj;
+module.exports = { param2Obj };

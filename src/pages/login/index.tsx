@@ -5,12 +5,16 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { setCache } from '@/utils/cache/session';
 import { getAuth, IResult } from '@/api/User';
+import { mockurl } from '@/utils/commonurl';
 
 export default function Login() {
   const navigate = useNavigate();
   const onFinish = (formValues) => {
     getAuth(formValues).then((res: IResult) => {
-      if (!res.data) {
+      const mockurl1 = '/mock';
+      const mockBoolean = mockurl.match(mockurl1) !== null;
+      const result = mockBoolean ? res : res.data;
+      if (!result) {
         message.error('账号或密码不匹配');
       } else {
         if (formValues.remeber) {
@@ -18,7 +22,7 @@ export default function Login() {
         } else {
           localStorage.setItem('token', JSON.stringify(res.token));
         }
-        localStorage.setItem('userInfo', JSON.stringify(res.data));
+        localStorage.setItem('userInfo', JSON.stringify(result));
         navigate('/');
       }
     });
@@ -34,7 +38,7 @@ export default function Login() {
           initialValues={{
             remember: true,
             number: '67890',
-            password: '234567',
+            password: '3456',
           }}
           onFinish={onFinish}
         >

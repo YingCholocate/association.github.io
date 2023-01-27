@@ -114,7 +114,7 @@ const getAuth = [
         return {
           code: 200,
           msg: 'success',
-          data: oneData,
+          data: oneData[0],
           token: '@string(20)',
         };
       } else if (obj.method === 'getall') {

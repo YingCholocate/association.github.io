@@ -22,7 +22,7 @@ function TopHeader(props: Iprops) {
     const userdata = {
       department: 0,
       number: '67890',
-      password: '234567',
+      password: '3456',
       role: [{ id: 0, rolevalue: '秘书处工作人员' }],
       username: 'admin',
     };
