@@ -4,7 +4,6 @@ import style from '../pages/sandbox/Home/Home.module.css';
 
 export default function Departahow(props) {
   const { departdata, departtitle } = props;
-  console.log(departdata());
   return (
     <div className={style.departstyle}>
       {/* 消息列表 */}

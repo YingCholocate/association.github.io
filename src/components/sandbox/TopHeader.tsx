@@ -21,9 +21,9 @@ function TopHeader(props: Iprops) {
   if (!localToken) {
     const userdata = {
       department: 0,
-      number: '32156789',
+      number: '67890',
       password: '234567',
-      role: [{ id: 0, rolevalue: '数资部工作人员' }],
+      role: [{ id: 0, rolevalue: '秘书处工作人员' }],
       username: 'admin',
     };
     localStorage.setItem('token', JSON.stringify(userdata));

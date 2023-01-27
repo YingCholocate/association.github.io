@@ -10,7 +10,6 @@ export default function Login() {
   const navigate = useNavigate();
   const onFinish = (formValues) => {
     getAuth(formValues).then((res: IResult) => {
-      console.log('res', res.data);
       if (!res.data) {
         message.error('账号或密码不匹配');
       } else {
@@ -34,7 +33,7 @@ export default function Login() {
           className="login-form"
           initialValues={{
             remember: true,
-            number: '32156789',
+            number: '67890',
             password: '234567',
           }}
           onFinish={onFinish}

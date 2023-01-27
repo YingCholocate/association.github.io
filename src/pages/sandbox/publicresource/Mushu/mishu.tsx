@@ -52,6 +52,7 @@ export default function Mishu() {
         fidate.forEach((item, i) => {
           const first = new Date(item);
           if (first.toDateString() === newtimedate.toDateString()) {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
             zc = i + 1;
           }
         });

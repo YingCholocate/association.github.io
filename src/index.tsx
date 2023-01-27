@@ -4,11 +4,11 @@ import './index.css';
 import App from './App';
 
 import { BrowserRouter } from 'react-router-dom';
-// import mockXHR from '../mock';
+import { mockXHR } from '../mock';
 
-// if (process.env.NODE_ENV === 'development') {
-//   mockXHR.mockXHR();
-// }
+if (process.env.NODE_ENV === 'production') {
+  mockXHR();
+}
 ReactDOM.render(
   <BrowserRouter>
     <App />,

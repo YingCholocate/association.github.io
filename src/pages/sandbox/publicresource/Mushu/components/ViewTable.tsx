@@ -94,6 +94,7 @@ export default function ViewTable(Iprops: Iprops) {
     const form = useContext(EditableContext)!;
     useMemo(() => {
       form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const save = async () => {
@@ -215,6 +216,7 @@ export default function ViewTable(Iprops: Iprops) {
     if (!defaultColumns.includes(newColumns) && editing) {
       defaultColumns.push(newColumns);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing]);
   const handleSave = (row: DataType) => {
     // 当我们state所定义的state类型为Object或Array时，在回调中直接setState是无法成功

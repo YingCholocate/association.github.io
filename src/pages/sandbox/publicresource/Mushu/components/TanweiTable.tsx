@@ -84,6 +84,7 @@ export default function TanweiTable(Iprops: Iprops) {
 
     useEffect(() => {
       record && form.setFieldsValue({ [dataIndex]: record[dataIndex] });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editing]);
 
     const save = async () => {

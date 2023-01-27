@@ -1,7 +1,8 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable @typescript-eslint/no-require-imports */
 // 使用插件覆盖webpack配置
-const { override,addWebpackAlias, overrideDevServer,addWebpackPlugin} = require('customize-cra');
-
+const { override,addWebpackAlias, overrideDevServer,addWebpackPlugin, removeModuleScopePlugin} = require('customize-cra');
+// const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const mockMiddleware= require('./mock/mock-server');
 const path = require('path');
 const ESLintWebpackPlugin = require('eslint-webpack-plugin');
@@ -20,24 +21,25 @@ const devServerConfig=()=>configs=>{
       if (!devServer) {
         throw new Error('webpack-dev-server is not defined');
       }
-      mockMiddleware(devServer.app)
+      mockMiddleware(devServer.app);
      
       return middlewares;
     }
-  }
-}
-module.exports =  {
+  };
+};
+module.exports = {
   webpack:override(
   addWebpackAlias({
     "@": path.resolve(__dirname, './src')
   }),
   addWebpackPlugin(new ESLintWebpackPlugin({
-    emitWarning: true, // new
+    emitWarning: false, // new
     failOnWarning: false, // new
-  }))
-  
+  })),
+  removeModuleScopePlugin()
+
 ) ,
 devServer:overrideDevServer(devServerConfig())
-}
+};
  
 
