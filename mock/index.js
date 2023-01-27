@@ -4,25 +4,24 @@ const Mock = require('mockjs');
 const qs = require('qs');
 const { param2Obj } = require('./utils.js');
 const { getAuth, registerUser, deleteUser } = require('./controller/user.js');
-const resourcedata = require('./controller/resourceData.js');
+const { getDepartmentData } = require('./controller/resourceData.js');
 const { getAllCourse, addCourse } = require('./controller/course.js');
-const { getTuiwen, deleteTuiwen, addTuiwen } = require('./controller/tuiwen');
+const { deleteTuiwen, addTuiwen } = require('./controller/tuiwen');
 
 const mocks = [
   ...getAuth,
   ...registerUser,
   ...deleteUser,
-  ...resourcedata,
+  ...getDepartmentData,
   ...getAllCourse,
   ...addCourse,
-  ...getTuiwen,
+
   ...deleteTuiwen,
   ...addTuiwen,
 ];
 
 function mockXHR() {
   Mock.XHR.prototype.proxy_send = Mock.XHR.prototype.send;
-  console.log(Mock.XHR);
   Mock.XHR.prototype.send = function () {
     if (this.custom.xhr) {
       this.custom.xhr.withCredentials = this.withCredentials || false;

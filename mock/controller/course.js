@@ -792,7 +792,7 @@ const getAllCourse = [
           data: AllData,
         };
       } else if (obj.method === 'getone') {
-        const oneData = AllData.filter((item) => item.stuid === obj.number);
+        const oneData = AllData.filter((item) => item.stuid === obj.index);
         return {
           code: 200,
           msg: 'success',

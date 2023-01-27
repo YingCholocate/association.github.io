@@ -2,41 +2,18 @@
 const Mock = require('mockjs');
 
 const { Random } = Mock;
-
 const data = Mock.mock({
   'array|7': [
     {
       id: () => Random.integer(0, 100),
       uploadtime: () => Random.date(),
       link: () => Random.url(),
-      ttle: () => Random.title(),
+      title: () => Random.title(),
       type: 1,
       rl: [{ id: () => Random.integer(0, 100), typevalue: '推文' }],
     },
   ],
 });
-
-const getTuiwen = [
-  {
-    url: `/resourcedata`,
-    type: 'get',
-    response: (config) => {
-      const { currentPage } = config.query;
-      // console.log('11', currentPage, config.query);
-      const newdata = data.array.slice(
-        (parseInt(currentPage, 10) - 1) * 3,
-        (parseInt(currentPage, 10) - 1) * 3 + 3,
-      );
-
-      return {
-        code: 200,
-        msg: 'success',
-        data: newdata,
-      };
-    },
-  },
-];
-
 const addTuiwen = [
   {
     url: `/resourcedata`,
@@ -74,4 +51,4 @@ const deleteTuiwen = [
     },
   },
 ];
-module.exports = { getTuiwen, deleteTuiwen, addTuiwen };
+module.exports = { deleteTuiwen, addTuiwen };

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, message } from 'antd';
 
 import style from './schedule.module.css';
 import { RightOutlined, LeftOutlined } from '@ant-design/icons';
-import { initialData, IData, IColumns, STARTANDEND } from '@/utils/staticData';
+import { initialData, IData, IColumns, STARTANDEND, USERSTATICInfo } from '@/utils/staticData';
 import { addCourse, getOneCourse } from '@/api/Course';
 import ScheduleLeft from './components/ScheduleLeft';
-import { IUser } from '@/api/User';
+import { getAllUserInfo, IUser } from '@/api/User';
 import PersonList from './components/PersonList';
 import CollectionCreateForm from './components/CollectionCreateForm';
 import { useAuth } from '@/utils/auth/AuthProvider';
@@ -17,7 +17,7 @@ const CollectionsPage = () => {
   const [left, setleft] = useState(style.toleft);
   const [right, setright] = useState(style.toright);
   // 点击展示的课表
-  const [clickNumber, setClickNumber] = useState(1);
+  const [clickNumber, setClickNumber] = useState('67890');
   const time = new Date();
   const [month, setmonth] = useState(time.getMonth() + 1);
   // 每一行的数据
@@ -85,6 +85,7 @@ const CollectionsPage = () => {
       handlefetchResult(result);
     };
     fetchData();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clickNumber]);
   const getdaytime = (arrday) => {
@@ -164,7 +165,28 @@ const CollectionsPage = () => {
     setVisible(false);
   };
 
-  const userdata: IUser[] = JSON.parse(localStorage.getItem('alluser') as string);
+  const userLocal = localStorage.getItem('allUser');
+  const [userdata, seUserData] = useState<IUser[]>([]);
+  // 用户信息
+  const getUserdata = async () => {
+    const userotherdata: IUser[] = [];
+    const result = await getAllUserInfo();
+    result.data.forEach((item) => {
+      userotherdata.push(item);
+    });
+    localStorage.setItem('alluser', JSON.stringify(userotherdata));
+    const asynGetUserInfo = async () => {};
+    asynGetUserInfo().catch(() => {
+      const userother = USERSTATICInfo;
+      localStorage.setItem('alluser', JSON.stringify(userother));
+    });
+    seUserData(() => (userLocal ? JSON.parse(userLocal) : userotherdata));
+  };
+  useMemo(() => {
+    getUserdata();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // 点击上一周
   const courcetoLeft = () => {
     if (zc > 1) {

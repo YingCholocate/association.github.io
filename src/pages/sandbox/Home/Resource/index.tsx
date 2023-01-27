@@ -48,10 +48,10 @@ export default function Resource() {
   const [yance, setYance] = useState<string[]>(initialState);
 
   useEffect(() => {
-    getDepartmentData(EresourceType.MISHU).then((res) => setMishu(res));
-    getDepartmentData(EresourceType.JISHU).then((res) => setJishu(res));
-    getDepartmentData(EresourceType.YANCE).then((res) => setYance(res));
-    getDepartmentData(EresourceType.SHUZI).then((res) => setShuzi(res));
+    getDepartmentData(EresourceType.MISHU).then((res) => setMishu(() => res));
+    getDepartmentData(EresourceType.JISHU).then((res) => setJishu(() => res));
+    getDepartmentData(EresourceType.YANCE).then((res) => setYance(() => res));
+    getDepartmentData(EresourceType.SHUZI).then((res) => setShuzi(() => res));
   }, []);
 
   // 展示资源

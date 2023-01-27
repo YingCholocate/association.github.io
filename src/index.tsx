@@ -6,7 +6,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 // import { mockXHR } from '../mock';
 // production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { mockXHR } = require('../mock');
   mockXHR();
