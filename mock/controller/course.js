@@ -57,6 +57,60 @@ const AllData = [
   },
   {
     id: 0,
+    stuid: '67890',
+    courseid: 1,
+    cd: [
+      {
+        id: 0,
+        zc: '7,8',
+        kcmc: 8,
+        jcdm: '0304',
+        jcdm2: '03,04',
+        xq: 1,
+        jxcdmc: '教110',
+        courseid: 1,
+        cou: [{ cid: 0, cname: '形势与政策', bgcolor: '#FF6699', courseid: 1 }],
+      },
+    ],
+  },
+  {
+    id: 0,
+    stuid: '67890',
+    courseid: 1,
+    cd: [
+      {
+        id: 0,
+        zc: '7,8',
+        kcmc: 8,
+        jcdm: '0304',
+        jcdm2: '03,04',
+        xq: 1,
+        jxcdmc: '教110',
+        courseid: 1,
+        cou: [{ cid: 0, cname: '形势与政策', bgcolor: '#FF6699', courseid: 1 }],
+      },
+    ],
+  },
+  {
+    id: 0,
+    stuid: '67890',
+    courseid: 1,
+    cd: [
+      {
+        id: 0,
+        zc: '7,8',
+        kcmc: 8,
+        jcdm: '0304',
+        jcdm2: '03,04',
+        xq: 1,
+        jxcdmc: '教110',
+        courseid: 1,
+        cou: [{ cid: 0, cname: '形势与政策', bgcolor: '#FF6699', courseid: 1 }],
+      },
+    ],
+  },
+  {
+    id: 0,
     stuid: '32156789',
     courseid: 1,
     cd: [

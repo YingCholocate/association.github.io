@@ -1,8 +1,9 @@
 import React from 'react';
-import { Form, Input, Cascader, Button } from 'antd';
+import { Form, Input, Cascader, Button, Image } from 'antd';
 import style from './register.module.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { registerUser } from '@/api/User';
+import path from '@/assets/photologo.png';
 
 const residences = [
   {
@@ -43,91 +44,99 @@ export default function Register() {
   };
   return (
     <div className={style.container}>
-      <div className={style.formcontainer}>
-        <h2>注册信息</h2>
-        <Form
-          name="normal_login"
-          className="login-form"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-        >
-          <Form.Item
-            name="residence"
-            label="职位"
-            rules={[
-              {
-                type: 'array',
-                required: true,
-                message: 'Please select your habitual residence!',
-              },
-            ]}
-          >
-            <Cascader options={residences} />
-          </Form.Item>
-          <Form.Item
-            name="number"
-            label="学号"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your 学号!',
-              },
-            ]}
-          >
-            <Input
-              type="number"
-              style={{
-                width: '100%',
+      <div className={style.logo}>
+        <Image width={50} src={path} preview={false} />
+        <span className={style.logoText}>大数据学生实践与发展协会</span>
+      </div>
+      <div className={style.bgContainer}>
+        <div className={style.bgColor}>
+          <div className={style.formcontainer}>
+            <h2>注册信息</h2>
+            <Form
+              name="normal_login"
+              className="login-form"
+              initialValues={{
+                remember: true,
               }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="username"
-            label="姓名"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your Username!',
-              },
-            ]}
-          >
-            <Input
-              type="text"
-              style={{
-                width: '100%',
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="密码"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your Password!',
-              },
-            ]}
-          >
-            <Input
-              type="password"
-              style={{
-                width: '100%',
-              }}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className={style.registerformbtn}>
-              注册
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <NavLink className={style.tologin} to="/login">
-              已有账号,前往登录
-            </NavLink>
-          </Form.Item>
-        </Form>
+              onFinish={onFinish}
+            >
+              <Form.Item
+                name="residence"
+                label="职位"
+                rules={[
+                  {
+                    type: 'array',
+                    required: true,
+                    message: 'Please select your habitual residence!',
+                  },
+                ]}
+              >
+                <Cascader options={residences} />
+              </Form.Item>
+              <Form.Item
+                name="number"
+                label="学号"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your 学号!',
+                  },
+                ]}
+              >
+                <Input
+                  type="number"
+                  style={{
+                    width: '100%',
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                name="username"
+                label="姓名"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your Username!',
+                  },
+                ]}
+              >
+                <Input
+                  type="text"
+                  style={{
+                    width: '100%',
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                label="密码"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your Password!',
+                  },
+                ]}
+              >
+                <Input
+                  type="password"
+                  style={{
+                    width: '100%',
+                  }}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" className={style.registerformbtn}>
+                  注册
+                </Button>
+              </Form.Item>
+              <Form.Item>
+                <NavLink className={style.tologin} to="/login">
+                  已有账号,前往登录
+                </NavLink>
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
       </div>
     </div>
   );

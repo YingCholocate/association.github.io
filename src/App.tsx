@@ -1,3 +1,4 @@
+import { Spin } from 'antd';
 import React from 'react';
 import { Provider } from 'react-redux';
 
@@ -13,7 +14,9 @@ function App() {
     <ErrorBoundary fallbackRender={ErrorInfo}>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <IndexRouter />
+          <React.Suspense fallback={<Spin />}>
+            <IndexRouter />
+          </React.Suspense>
         </PersistGate>
       </Provider>
     </ErrorBoundary>

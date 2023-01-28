@@ -7,34 +7,36 @@ import {
   ShouldRevalidateFunction,
   useRoutes,
 } from 'react-router-dom';
-import Login from '../pages/login';
-import Home from '../pages/sandbox/Home';
-import Schedule from '../pages/sandbox/schedule';
-import NewSandBox from '../pages/Layout/NewSandBox';
-import Jishu from '../pages/sandbox/publicresource/jishu';
-import Mishu from '../pages/sandbox/publicresource/Mushu/mishu';
-import Yance from '../pages/sandbox/publicresource/yance';
-import Shuzi from '../pages/sandbox/publicresource/shuzi';
-import Error404 from '../pages/error/404';
-import Register from '../pages/register/register';
-import Mishuupload from '../pages/sandbox/publicresource/mishuupload';
 import AuthProvider from '@/utils/auth/AuthProvider';
 import RequireAuth from '@/utils/auth/RequireAuth';
+
+const LazyLogin = React.lazy(() => import('../pages/login'));
+const LazyHome = React.lazy(() => import('../pages/sandbox/Home'));
+const LazySchedule = React.lazy(() => import('../pages/sandbox/schedule'));
+
+const LazyNewSandBox = React.lazy(() => import('../pages/Layout/NewSandBox'));
+const LazyJishu = React.lazy(() => import('../pages/sandbox/publicresource/jishu'));
+const LazyMishu = React.lazy(() => import('../pages/sandbox/publicresource/Mushu/mishu'));
+const LazyYance = React.lazy(() => import('../pages/sandbox/publicresource/yance'));
+const LazyShuzi = React.lazy(() => import('../pages/sandbox/publicresource/shuzi'));
+const LazyError404 = React.lazy(() => import('../pages/error/404'));
+const LazyRegister = React.lazy(() => import('../pages/register/register'));
+const LazyMishuupload = React.lazy(() => import('../pages/sandbox/publicresource/mishuupload'));
 
 export default function IndexRouter() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<NewSandBox />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/association.github.io" element={<Home />} />
+        <Route path="/login" element={<LazyLogin />} />
+        <Route path="/register" element={<LazyRegister />} />
+        <Route path="/" element={<LazyNewSandBox />}>
+          <Route path="/" element={<LazyHome />} />
+          <Route path="/association.github.io" element={<LazyHome />} />
           <Route
             path="/schedule"
             element={
               <RequireAuth>
-                <Schedule />
+                <LazySchedule />
               </RequireAuth>
             }
           />
@@ -43,7 +45,7 @@ export default function IndexRouter() {
             path="/resource/Jishu"
             element={
               <RequireAuth>
-                <Jishu />
+                <LazyJishu />
               </RequireAuth>
             }
           />
@@ -52,7 +54,7 @@ export default function IndexRouter() {
               path="arrange"
               element={
                 <RequireAuth>
-                  <Mishu />
+                  <LazyMishu />
                 </RequireAuth>
               }
             />
@@ -60,7 +62,7 @@ export default function IndexRouter() {
               path="upload"
               element={
                 <RequireAuth>
-                  <Mishuupload />
+                  <LazyMishuupload />
                 </RequireAuth>
               }
             />
@@ -69,7 +71,7 @@ export default function IndexRouter() {
             path="/resource/Yance"
             element={
               <RequireAuth>
-                <Yance />
+                <LazyYance />
               </RequireAuth>
             }
           />
@@ -77,12 +79,12 @@ export default function IndexRouter() {
             path="/resource/Shuzi"
             element={
               <RequireAuth>
-                <Shuzi />
+                <LazyShuzi />
               </RequireAuth>
             }
           />
 
-          <Route path="*" element={<Error404 />} />
+          <Route path="*" element={<LazyError404 />} />
         </Route>
       </Routes>
     </AuthProvider>
@@ -103,8 +105,8 @@ export interface RouteObject {
 }
 export const GetAdminRoute = () => {
   const router = useRoutes([
-    { path: '/login', element: <Login /> },
-    { path: '/register', element: <Register /> },
+    { path: '/login', element: <LazyLogin /> },
+    { path: '/register', element: <LazyRegister /> },
   ]);
   return router;
 };

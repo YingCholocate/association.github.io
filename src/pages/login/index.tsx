@@ -5,9 +5,6 @@ import path from '@/assets/photologo.png';
 
 import LoginForm from './components/LoginForm';
 
-// import LoginForm from './components/LoginForm';
-// import Register from '../register/register';
-
 export default function Login() {
   return (
     <div className={style.container}>
