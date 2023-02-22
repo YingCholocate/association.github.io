@@ -45,19 +45,6 @@ const addCustomize = () => config => {
     parallel: 4,
   })]
  
-    if (config.entry && config.entry instanceof Array) {
-      config.entry = {
-        main: config.entry,
-        vendor: ["react", "react-dom", "react-router-dom", "react-redux", "redux", 'react-router-config',
-          "lodash", "moment", 'react-intl', 'react-addons-pure-render-mixin', 'redux-promise-middleware', "react-router", 
-        ]
-      };
-    } else if (config.entry && typeof config.entry === 'object') {
-      config.entry.vendor = ["react", "react-dom", "react-router-dom", "react-redux", "redux", 'react-router-config', 
-         "lodash", "moment", 'react-intl', 'react-addons-pure-render-mixin', 'redux-promise-middleware', "react-router", 
-      ];
-    }
-
    //  最小化entry chunk
    config.optimization.runtimeChunk=true;
    //  代码分离 

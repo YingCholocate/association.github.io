@@ -1,17 +1,9 @@
 import * as React from 'react';
-import {
-  Routes,
-  Route,
-  ActionFunction,
-  LoaderFunction,
-  ShouldRevalidateFunction,
-  useRoutes,
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AuthProvider from '@/utils/auth/AuthProvider';
 import RequireAuth from '@/utils/auth/RequireAuth';
-import Login from '../pages/login';
 
-// const LazyLogin = React.lazy(() => import('../pages/login'));
+const LazyLogin = React.lazy(() => import('../pages/login'));
 const LazyHome = React.lazy(() => import('../pages/sandbox/Home'));
 const LazySchedule = React.lazy(() => import('../pages/sandbox/schedule'));
 
@@ -28,10 +20,10 @@ export default function IndexRouter() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<LazyLogin />} />
         <Route path="/register" element={<LazyRegister />} />
         <Route path="/" element={<LazyNewSandBox />}>
-          <Route path="/" element={<LazyHome />} />
+          {/* <Route path="/" element={<LazyHome />} /> */}
           <Route path="/association.github.io" element={<LazyHome />} />
           <Route
             path="/schedule"
@@ -91,23 +83,3 @@ export default function IndexRouter() {
     </AuthProvider>
   );
 }
-// 使用config的形式书写
-export interface RouteObject {
-  path?: string;
-  index?: boolean;
-  children?: React.ReactNode;
-  caseSensitive?: boolean;
-  id?: string;
-  loader?: LoaderFunction;
-  action?: ActionFunction;
-  element?: React.ReactNode | null;
-  errorElement?: React.ReactNode | null;
-  shouldRevalidate?: ShouldRevalidateFunction;
-}
-export const GetAdminRoute = () => {
-  const router = useRoutes([
-    { path: '/login', element: <Login /> },
-    { path: '/register', element: <LazyRegister /> },
-  ]);
-  return router;
-};

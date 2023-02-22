@@ -23,7 +23,7 @@ export default function LoginForm(props) {
           localStorage.setItem('token', JSON.stringify(res.token));
         }
         localStorage.setItem('userInfo', JSON.stringify(result));
-        navigate('/');
+        navigate('/association.github.io');
         window.location.reload();
       }
     });
