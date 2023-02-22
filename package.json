@@ -113,5 +113,5 @@
       "prettier --config ./.prettierrc.js --write"
     ]
   },
-  "homepage": "./login"
+  "homepage": "."
 }
