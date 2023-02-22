@@ -20,6 +20,9 @@ export default class ErrorBoundary extends Component<
   render() {
     const { error } = this.state;
     const { children, fallbackRender } = this.props;
+    if (error && String(error).includes('Loading chunk') && String(error).includes('failed')) {
+      window.location.reload();
+    }
     return error ? fallbackRender({ error }) : children;
   }
 }

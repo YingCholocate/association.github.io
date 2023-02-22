@@ -1,6 +1,5 @@
 {
   "name": "association",
-  "sideEffects": false,
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -114,5 +113,5 @@
       "prettier --config ./.prettierrc.js --write"
     ]
   },
-  "homepage": "."
+  "homepage": "./login"
 }

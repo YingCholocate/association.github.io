@@ -10,8 +10,8 @@ export default class Error404 extends Component {
         title="404"
         subTitle="对不起，你访问的页面不存在"
         extra={
-          <Button type="primary" onClick={() => this.props.history.goBack()}>
-            返回上一页
+          <Button type="primary" onClick={() => window.location.replace(window.location.href)}>
+            刷新页面
           </Button>
         }
       />
