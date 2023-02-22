@@ -9,9 +9,9 @@ import {
 } from 'react-router-dom';
 import AuthProvider from '@/utils/auth/AuthProvider';
 import RequireAuth from '@/utils/auth/RequireAuth';
-// import Login from '../pages/login';
+import Login from '../pages/login';
 
-const LazyLogin = React.lazy(() => import('../pages/login'));
+// const LazyLogin = React.lazy(() => import('../pages/login'));
 const LazyHome = React.lazy(() => import('../pages/sandbox/Home'));
 const LazySchedule = React.lazy(() => import('../pages/sandbox/schedule'));
 
@@ -28,7 +28,7 @@ export default function IndexRouter() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/login" element={<LazyLogin />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<LazyRegister />} />
         <Route path="/" element={<LazyNewSandBox />}>
           <Route path="/" element={<LazyHome />} />
@@ -106,7 +106,7 @@ export interface RouteObject {
 }
 export const GetAdminRoute = () => {
   const router = useRoutes([
-    { path: '/login', element: <LazyLogin /> },
+    { path: '/login', element: <Login /> },
     { path: '/register', element: <LazyRegister /> },
   ]);
   return router;
